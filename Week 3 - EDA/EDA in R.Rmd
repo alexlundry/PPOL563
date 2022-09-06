@@ -1,8 +1,6 @@
 ---
 title: "PPOL 563 - Week 3: Exploratory Data Analysis in R"
-output: 
-  html_document: 
-    keep_md: yes
+output: github_document
 ---
 
 For this demonstration and the ensuing exercise we will be using the [Gapminder](https://www.gapminder.org/) dataset. 
