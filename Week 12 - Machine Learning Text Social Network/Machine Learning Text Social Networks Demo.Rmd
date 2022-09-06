@@ -1,0 +1,143 @@
+---
+title: "Machine Learning, Text and Networks Demo"
+output: html_notebook
+---
+
+### Word Clouds
+
+We've got a dataset of a Gallup survey from 2014 that asks an open ended question about how people would feel if Hilary Clinton were to become president.  What is the most positive thing and what is the worst thing about it?  First, we need to do some basic read in and data manipulation.  It's in a weird format so I had to do some cumbersome gymnastics to get it into shape.  Not elegant, but very real.
+
+```{r}
+install.packages("memisc")
+library(memisc)
+library(tidyverse)
+
+d1 <- as.data.set(spss.portable.file("~/Downloads/g2014tr0315.por"))
+
+d2 <- d1[, c("ID", "WTFCTR", "LANGUAGE", "P862_1_T", "P862_2_T", "P862_3_T", "P863_1_T", "P863_2_T", "P863_3_T", "D16")] 
+d3 <- as.data.frame(d2) %>% 
+   filter(LANGUAGE == "English")
+
+d3$P862_1_T <- as.character(d3$P862_1_T)
+d3$P862_2_T <- as.character(d3$P862_2_T)
+d3$P862_3_T <- as.character(d3$P862_3_T)
+d3$P863_1_T <- as.character(d3$P863_1_T)
+d3$P863_2_T <- as.character(d3$P863_2_T)
+d3$P863_3_T <- as.character(d3$P863_3_T)
+d3$D16 <- as.numeric(d3$D16)
+
+d3 <- d3 %>%
+   mutate(ideo_x = ifelse(D16 <= 2, "Cons", 
+                          ifelse(D16 == 3, "Mod", 
+                                 ifelse(D16 <= 5, "Lib", NA))))
+
+
+glimpse(d3)
+```
+
+Here we do just a single word cloud.  Note the creation of a custom stop words list, as well as the clean up of the text in the mutate statement.  
+
+```{r}
+library(tidytext)
+library(wordcloud)
+library(reshape2)
+custom_stops <- c("ummm", "answer", "president")
+
+custom_stop_words <- tibble(word = custom_stops) %>%
+   mutate(lexicon = "custom")
+
+# Suppose Hillary Clinton is elected president in 2016. In your view, what would be the best or most positive thing about a Hillary Clinton presidency? 
+# Single word cloud
+d3 %>% 
+   filter(is.na(ideo_x) == F) %>%
+   mutate(clinton_oe = str_c(P862_1_T, ";", P862_2_T, ";", P862_3_T)) %>% 
+   mutate(clinton_oe = str_replace_all(clinton_oe %>% tolower, "barrack", "barack"),
+          clinton_oe = str_replace_all(clinton_oe %>% tolower, "women", "woman"),
+          clinton_oe = str_replace_all(clinton_oe %>% tolower, "women's", "woman"),
+          clinton_oe = str_replace_all(clinton_oe %>% tolower, "woman's", "woman")) %>% 
+   unnest_tokens(word, clinton_oe) %>%
+   anti_join(stop_words) %>%
+   anti_join(custom_stop_words) %>%
+   count(word, wt = WTFCTR, sort = T) %>%
+   with(wordcloud(word, n, 
+                  max.words = 50, 
+                  scale=c(3, 0.6), 
+                  random.order = F,
+                  rot.per = 0,
+                  color = "green"))
+```
+
+
+
+
+```{r}
+# Suppose Hillary Clinton is elected president in 2016. In your view, what would be the best or most positive thing about a Hillary Clinton presidency? 
+d3 %>% 
+   filter(is.na(ideo_x) == F) %>%
+   mutate(clinton_oe = str_c(P862_1_T, ";", P862_2_T, ";", P862_3_T)) %>% 
+   mutate(clinton_oe = str_replace_all(clinton_oe %>% tolower, "barrack", "barack"),
+          clinton_oe = str_replace_all(clinton_oe %>% tolower, "women", "woman"),
+          clinton_oe = str_replace_all(clinton_oe %>% tolower, "women's", "woman"),
+          clinton_oe = str_replace_all(clinton_oe %>% tolower, "woman's", "woman")) %>% 
+   unnest_tokens(word, clinton_oe) %>%
+   anti_join(stop_words) %>%
+   anti_join(custom_stop_words) %>%
+   count(ideo_x, word, wt = WTFCTR, sort = T) %>%
+   acast(word ~ ideo_x, value.var = "n", fill = 0) %>%
+   comparison.cloud(colors = c("red", "blue", "grey"),
+                    scale = c(0.6,3),
+                    max.words = 30,
+                    random.order = F,
+                    title.size = .5,
+                    rot.per = 0)
+```
+
+```{r}
+custom_stops <- c("ummm", "answer", "president")
+
+custom_stop_words <- tibble(word = custom_stops) %>%
+   mutate(lexicon = "custom")
+
+# And, what would be the worst or most negative thing about a Hillary Clinton presidency?
+# Single word cloud
+d3 %>% 
+   filter(is.na(ideo_x) == F) %>%
+   mutate(clinton_oe_neg = str_c(P863_1_T, ";", P863_2_T, ";", P863_3_T)) %>% 
+   mutate(clinton_oe_neg = str_replace_all(clinton_oe_neg %>% tolower, "barrack", "barack"),
+          clinton_oe_neg = str_replace_all(clinton_oe_neg %>% tolower, "women", "woman"),
+          clinton_oe_neg = str_replace_all(clinton_oe_neg %>% tolower, "women's", "woman"),
+          clinton_oe_neg = str_replace_all(clinton_oe_neg %>% tolower, "woman's", "woman")) %>% 
+   unnest_tokens(word, clinton_oe_neg) %>%
+   anti_join(stop_words) %>%
+   anti_join(custom_stop_words) %>%
+   count(word, wt = WTFCTR, sort = T) %>%
+   with(wordcloud(word, n, 
+                  max.words = 50, 
+                  scale=c(3, 0.6), 
+                  random.order = F,
+                  rot.per = 0,
+                  color = "black"))
+```
+
+
+```{r}
+d3 %>% 
+   filter(is.na(ideo_x) == F) %>%
+   mutate(clinton_oe_neg = str_c(P863_1_T, ";", P863_2_T, ";", P863_3_T)) %>% 
+   mutate(clinton_oe_neg = str_replace_all(clinton_oe_neg %>% tolower, "barrack", "barack"),
+          clinton_oe_neg = str_replace_all(clinton_oe_neg %>% tolower, "women", "woman"),
+          clinton_oe_neg = str_replace_all(clinton_oe_neg %>% tolower, "women's", "woman"),
+          clinton_oe_neg = str_replace_all(clinton_oe_neg %>% tolower, "woman's", "woman")) %>% 
+   unnest_tokens(word, clinton_oe_neg) %>%
+   anti_join(stop_words) %>%
+   anti_join(custom_stop_words) %>%
+   count(ideo_x, word, wt = WTFCTR, sort = T) %>%
+   acast(word ~ ideo_x, value.var = "n", fill = 0) %>%
+   comparison.cloud(colors = c("red", "blue", "grey"),
+                    scale = c(0.6,3),
+                    max.words = 30,
+                    random.order = F,
+                    title.size = .5,
+                    rot.per = 0)
+```
+
