@@ -12,7 +12,13 @@ Every graph can be described as a combination of independent building blocks:
 * **geom**etric objects: points, lines, areas, arrows, …
 * **coord**inate system: Cartesian, log, polar, map
 
-We'll be working with the 'gapminder' data again (but this time the clean/filtered version).  Let's recreate one of the scatterplots we used in our EDA demo.
+We'll be working with the `gapminder` data again (but this time the clean/filtered version).  Let's recreate one of the scatterplots we used in our EDA demo.
+
+```{r}
+library(tidyverse)
+library(gapminder)
+```
+
 
 ## Layering
 
@@ -109,8 +115,8 @@ ggplot(gapminder,
 
 Let's see how we can change a few other things:
 
-* Below, we've changed the mapping of the color aesthetic to 'year'
-* Mapped 'continent' to shape
+* Below, we've changed the mapping of the color aesthetic to `year`
+* Mapped `continent` to shape
 * Set the alpha level of the shape to 0.8; alpha tells us how transparent to make the mark and runs from 0 (completely transparent) to 1 (completely opaque). 
 
 This doesn't build us a very helpful plot for interpretation, but hopefully it helps YOU see how you can work with different aesthetic mappings.
@@ -126,7 +132,7 @@ ggplot(data = gapminder,
 
 Before we move on to other ggplot2 building blocks, let's go back to a reasonable plot, and see what we can do with color.
 
-First, know that you can manually change the colors with 'scale_color_manual'.  You can specify 140 colors by name; or you can use hex.
+First, know that you can manually change the colors with `scale_color_manual`.  You can specify 140 colors by name; or you can use hex.
 
 ```{r}
 ggplot(data = gapminder, 
@@ -151,14 +157,14 @@ print(p2)
 
 We can use a colorblindness simulator to see what this palette looks like to the colorblind.  (This package isn't on CRAN yet, so you need to install it directly from github)
 
-Calling it's function 'cvd_grid' and passing it a graph object will display what it will look like to people with four different kinds of color blindness.
+Calling it's function `cvd_grid` and passing it a graph object will display what it will look like to people with four different kinds of color blindness.
 
 ```{r}
 # remotes::install_github("clauswilke/colorblindr", quiet = TRUE)
 colorblindr::cvd_grid(p2)
 ```
 
-We can use a built in palette from the 'colorblindr' package.
+We can use a built in palette from the `colorblindr` package.
 
 ```{r}
 p3 <- ggplot(data = gapminder, 
@@ -199,7 +205,7 @@ ggplot(gapminder,
    scale_x_log10() +
    facet_wrap(~ continent)
 ```
-One thing you can do to make the facets (potentially) more interesting is to let the x and/or y axes vary within each plot.  You do that by passing it a 'scales' argument of one of the following:
+One thing you can do to make the facets (potentially) more interesting is to let the x and/or y axes vary within each plot.  You do that by passing it a `scales` argument of one of the following:
 
 * scales = "fixed": x and y scales are fixed across all panels
 * scales = "free_x": the x scale is free, and the y scale is fixed
@@ -215,7 +221,7 @@ ggplot(gapminder,
    facet_wrap(~ continent, scales = "free")
 ```
 
-You can also use 'facet_grid' with two discrete variables to add yet another layer to your graphic.  Since we don't have another low-dimensional categorical variable in the dataset, we'll make one up to show how it 'facet_grid' would work:
+You can also use `facet_grid` with two discrete variables to add yet another layer to your graphic.  Since we don't have another low-dimensional categorical variable in the dataset, we'll make one up to show how it `facet_grid` would work:
 
 ```{r}
 d2 <- gapminder %>% 
@@ -235,7 +241,7 @@ ggplot(d2,
 Other ggplot2 building blocks:
 * **pos**ition adjustments: jitter, dodge, stack…
 
-Position is most helpful with bar charts, which we'll show later in this demonstration, but for now, just to continue with our previous examples, here's a plot you're unlikely to make, but it demonstrates 'position = "jitter"'
+Position is most helpful with bar charts, which we'll show later in this demonstration, but for now, just to continue with our previous examples, here's a plot you're unlikely to make, but it demonstrates `position = "jitter"`
 
 >“The jitter geom is a convenient shortcut for geom_point(position = "jitter"). It adds a small amount of random variation to the location of each point, and is a useful way of handling overplotting caused by discreteness in smaller datasets.”
 
@@ -247,7 +253,7 @@ ggplot(gapminder,
    geom_point(aes(color = continent), position = "jitter") +
    scale_x_log10()
 ```
-Here's what it would look like without the 'position = jitter" call.
+Here's what it would look like without the `position = jitter` call.
 
 ```{r}
 ggplot(gapminder, 
@@ -257,7 +263,7 @@ ggplot(gapminder,
 ```
 Let's make a bar chart using our data to demonstrate how position can be used.  To make the visualization a bit easier to read and handle (though it will still be a long way from great!), we are going to limit it to the top 5 countries on each continent by population in 2007. 
 
-First, here is just a regular bar chart, which automatically stacks the country bars on top of each other.  This is 'position = "stack"'
+First, here is just a regular bar chart, which automatically stacks the country bars on top of each other.  This is `position = "stack"`
 
 ```{r}
 gapminder %>% 
@@ -270,7 +276,7 @@ gapminder %>%
    theme(legend.position = "none")
 ```
 
-Next we use 'position = "fill"' to make it a 100% stacked bar chart.  It's anot a great chart, but hopefully you get the point.
+Next we use `position = "fill"` to make it a 100% stacked bar chart.  It's not a great chart, but hopefully you get the point.
 
 ```{r}
 gapminder %>% 
@@ -283,7 +289,7 @@ gapminder %>%
    theme(legend.position = "none")
 ```
 
-And finally, we can use 'position = "dodge"' to make it a grouped bar chart.  Again, not a great chart, but this should serve for position demonstration purposes.
+And finally, we can use `position = "dodge"` to make it a grouped bar chart.  Again, not a great chart, but this should serve for position demonstration purposes.
 
 ```{r}
 gapminder %>% 
@@ -304,9 +310,9 @@ Other ggplot2 building blocks:
 * **layer**s:  graph elements can be combined with “+”; graphs can be saved to a variable and then have layers added on to them iteratively.
 * **theme**s: change graphic elements consistently
 
-Below, we create a plot named 'p1' which uses a **linear model** statistical transformation for to display it's 'geom_smooth'.  It makes an aesthetic call to 'color=continent' so there are separate linear trend lines for each continent group.
+Below, we create a plot named `p1` which uses a **linear model** statistical transformation for to display it's `geom_smooth`.  It makes an aesthetic call to `color=continent` so there are separate linear trend lines for each continent group.
 
-We can then call 'p1' and add another layer on top of it that is *another* 'geom_smooth', but this one uses the loess method and has a constant color attribute (instead of mapping any variable onto the color aesthetic).
+We can then call `p1` and add another layer on top of it that is *another* `geom_smooth`, but this one uses the loess method and has a constant color attribute (instead of mapping any variable onto the color aesthetic).
 
 Note that this just as easily could have been done in one big ggplot call with multiple layers, we are just doing it this way to show you how you can name plots and recall them later to add layers.  
 
@@ -318,11 +324,11 @@ p1 <- ggplot(data = gapminder,
 
 p1 +
    geom_smooth(method="loess", color="black", se=FALSE) +
-   scale_x_log10()
+   scale_x_log10() 
 ```
 ## Themes
 
-Now let's see what happens when we change a plots theme.  ggplot2 comes with a number of built-in themes that can be easily called.  Note if you haven't saved a ggplot object, 'last_plot()' gives you something to work with.  
+Now let's see what happens when we change a plots theme.  ggplot2 comes with a number of built-in themes that can be easily called.  Note if you haven't saved a ggplot object, `last_plot()` gives you something to work with.  
 
 ```{r}
 last_plot() + theme_bw()
@@ -331,7 +337,7 @@ last_plot() + theme_bw()
 last_plot() + theme_dark()
 ```
 
-You can obtain other people's alternative themes through packages like 'ggthemes'
+You can obtain other people's alternative themes through packages like `ggthemes`
 
 ```{r}
 last_plot() + ggthemes::theme_economist()
@@ -345,13 +351,38 @@ last_plot() + ggthemes::theme_wsj()
 ```{r}
 last_plot() + ggthemes::theme_tufte()
 ```
+
+You can update a theme just by adding another `theme` call:
+
+```{r}
+last_plot() + 
+   theme(legend.position = "top")
+```
+
+You can also create custom themes and then use them as needed:
+
+```{r}
+dra_theme <- theme(plot.title = element_text(size=30, face = "bold", family = "DIN-Bold"),
+   legend.position = "top",
+   legend.text = element_text(family = "DIN-Regular"),
+   legend.title = element_blank(),
+   strip.text.x = element_text(size = 12, family = "DIN-Regular"),
+   plot.subtitle = element_text(face = "italic", family = "Ropa Sans"),
+   plot.caption = element_text(face = "italic", family = "Ropa Sans"),
+   axis.text = element_text(family = "DIN-Bold"),
+   axis.title = element_text(size = 12, family = "DIN-Regular"))
+
+last_plot() + 
+   dra_theme
+```
+
 ## Labeling
 
-Sometimes it's useful to label points to show their identities.  'geom_text' usually gives messy, overlapping text.  Before we fix that, notice a few other things I'm doing here.  
+Sometimes it's useful to label points to show their identities.  `geom_text` usually gives messy, overlapping text.  Before we fix that, notice a few other things I'm doing here.  
 
 * Because we are demonstrating labels, I wanted to narrow down the dataset, so I'm using tidyverse techniques like pipes and filter so that we are only looking at 2007, the most recent year available.
 * Notice that because I'm using pipes, I don't need to declare a dataset in the first ggplot statement.  It inherits the previous data from the pipe.
-* I've also added better labels and a title through the use of the 'labs' layer.
+* I've also added better x and y labels and a title through the use of the `labs` layer.
 
 ```{r}
 gapminder %>% 
@@ -366,7 +397,30 @@ gapminder %>%
         x = "Per Capita GDP",
         y = "Life Expectancy")
 ```
-There are two ways we can deal with this messy text.  First, we can use a library called 'ggrepel' which has an adapted text geom called 'geom_text_repel'.  It repels overlapping text labels.  Text labels repel away from each other, away from data points, and away from edges of the plotting area (panel).
+
+We still need to fixe that messy label text, but let's make a few improvements first:
+
+* Change the labels on the X axis to better show that its a currency.  I'm using the `scales` library here, which allows for commas, currency, percents, scientific notation, and others. 
+* Notice that I’m changing the accuracy to lose 2 decimal points, scaling the number by 1/1000 and then adding a suffix of “k” to it. The “dollar_format” argument gives me the $.
+* Let's also add a subtitle and a caption.  I'd make them something more original, but I'm at my daughter's figure skating practice and its very cold, which makes it hard to be creative.
+
+```{r}
+gapminder %>% 
+   filter(year == max(year),
+          continent == "Americas") %>% 
+   ggplot(aes(gdpPercap, lifeExp)) +
+   geom_point() +
+   geom_text(aes(label = country)) +
+   scale_x_log10(labels = scales::dollar_format(accuracy = 2, scale = 1/1000, suffix = "K")) +
+   geom_smooth() +
+   labs(title = "Per Capita GDP by Life Expectancy in the Americas - 2007",
+        subtitle = "This is where the subtitle goes.",
+        caption = "Here is the caption text.",
+        x = "Per Capita GDP",
+        y = "Life Expectancy")
+```
+
+There are two ways we can deal with this messy text.  First, we can use a library called `ggrepel` which has an adapted text geom called `geom_text_repel`.  It repels overlapping text labels.  Text labels repel away from each other, away from data points, and away from edges of the plotting area (panel).
 
 ```{r}
 gapminder %>% 
@@ -398,7 +452,7 @@ resids1 <- residuals(model1)
 d1 <- d1 %>% 
    mutate(country_label = ifelse(abs(resids1) > 2.5, as.character(country), ""))
 
-ggplot(d1, aes(gdpPercap, lifeExp)) +
+p2 <- ggplot(d1, aes(gdpPercap, lifeExp)) +
    geom_point() +
    ggrepel::geom_text_repel(aes(label = country_label)) +
    scale_x_log10() +
@@ -406,18 +460,43 @@ ggplot(d1, aes(gdpPercap, lifeExp)) +
    labs(title = "Per Capita GDP by Life Expectancy in the Americas - 2007",
         x = "Per Capita GDP",
         y = "Life Expectancy")
+
+p2
 ```
+
+You can zoom in on your plots, but there are two very different ways to do that.  You can zoom and clip the data (essentially filter unseen data out of the dataset), or you can zoom and NOT clip the data, it is more a literal zoom in.  
+
+Let's see how it works when we do not clip the data.  
+
+We call `coord_cartesion` and put in very high limits on both axes very high, but it doesn’t get rid of the data.  Notice how you can still see some of the labels AND the trend line is unchanged from what we had in the previous plot.  
+
+```{r}
+p2 + 
+   coord_cartesian(xlim = c(10000, 50000), ylim = c(75, 85))
+```
+
+Now we DO clip (filter) the data:
+
+```{r}
+p2 +
+   xlim(10000, 50000) +
+   ylim(75, 85)
+```
+
+* Here instead we call xlim and ylim (we could also have put “limits =” arguments into a `scale_x_continuous` function and `scale_y_continuous` function.
+* Notice the warnings that tell us they removed data, and also notice how there is only one trend line, and not enough to give us a confidence interval.
+
 ## Saving Plots
 
 You'll want to save your plots eventually.
 
-* To save your most recent plot, just use 'ggsave' with a path and filename
+* To save your most recent plot, just use `ggsave` with a path and filename
 
 ```{r}
 ggsave("~/Dropbox (Personal)/Teaching/PPOL 563/Week 6 - ggplot2/gdpPercap_by_lifeExp_Americas_2007.png")
 ```
 
-* If you have a plot object, name it as an argument to the 'ggsave' function
+* If you have a plot object, name it as an argument to the `ggsave` function
 
 ```{r}
 ggsave(p1, "~/Dropbox (Personal)/Teaching/PPOL 563/Week 6 - ggplot2/p1.png")
@@ -430,4 +509,30 @@ ggsave(p1, "~/Dropbox (Personal)/Teaching/PPOL 563/Week 6 - ggplot2/p1.png")
 ```{r}
 ggsave("~/Dropbox (Personal)/Teaching/PPOL 563/Week 6 - ggplot2/test.pdf", width = 8.5, height = 11, units = "in")
 ```
+
+
+## Pie Charts
+
+Let's make some pies. If you think about it, a pie chart is just a bar chart in polar coordinates! So first, we have to make a bar chart.  This will be a simple count based chart (no percentages) just to keep things less confusing for now.
+
+```{r}
+pie1 <- gapminder %>% 
+   filter(year == 2007,
+          continent == "Americas") %>% 
+   arrange(desc(pop)) %>% 
+   top_n(5) %>%
+   ggplot(aes(x = "", y = pop, fill = country)) +
+   geom_bar(stat = "identity")
+
+pie1
+```
+
+Now we simply take that bar chart and convert the coordinates to polar using `coord_polar`.  I've also added a `theme_void` call because without it the default gives you some weird lines and shading.  
+
+```{r}
+pie1 +
+   coord_polar("y", start = 0) + 
+   theme_void()
+```
+
 
