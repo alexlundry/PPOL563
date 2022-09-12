@@ -1,6 +1,6 @@
 ---
 title: "ggplot2 Overview & Demonstration"
-output: html_notebook
+output: github_document
 ---
 
 ## Intro
@@ -486,31 +486,6 @@ p2 +
 * Here instead we call xlim and ylim (we could also have put “limits =” arguments into a `scale_x_continuous` function and `scale_y_continuous` function.
 * Notice the warnings that tell us they removed data, and also notice how there is only one trend line, and not enough to give us a confidence interval.
 
-## Saving Plots
-
-You'll want to save your plots eventually.
-
-* To save your most recent plot, just use `ggsave` with a path and filename
-
-```{r}
-ggsave("~/Dropbox (Personal)/Teaching/PPOL 563/Week 6 - ggplot2/gdpPercap_by_lifeExp_Americas_2007.png")
-```
-
-* If you have a plot object, name it as an argument to the `ggsave` function
-
-```{r}
-ggsave(p1, "~/Dropbox (Personal)/Teaching/PPOL 563/Week 6 - ggplot2/p1.png")
-```
-
-* You can also specify the size it is saved in, indicating the height and width and the appropriate units ( options are "in", "cm", "mm", "px").
-
-* You can also save it in a number of different formats (pdf, png, eps, svg, jpg, ...)
-
-```{r}
-ggsave("~/Dropbox (Personal)/Teaching/PPOL 563/Week 6 - ggplot2/test.pdf", width = 8.5, height = 11, units = "in")
-```
-
-
 ## Pie Charts
 
 Let's make some pies. If you think about it, a pie chart is just a bar chart in polar coordinates! So first, we have to make a bar chart.  This will be a simple count based chart (no percentages) just to keep things less confusing for now.
@@ -533,6 +508,30 @@ Now we simply take that bar chart and convert the coordinates to polar using `co
 pie1 +
    coord_polar("y", start = 0) + 
    theme_void()
+```
+
+## Saving Plots
+
+You'll want to save your plots eventually.
+
+* To save your most recent plot, just use `ggsave` with a path and filename
+
+```{r}
+ggsave("~/Dropbox (Personal)/Teaching/PPOL 563/plots/pop_top5_americas.png")
+```
+
+* If you have a plot object, name it as an argument to the `ggsave` function
+
+```{r}
+ggsave("~/Dropbox (Personal)/Teaching/PPOL 563/plots/test1.png", p2)
+```
+
+* You can also specify the size it is saved in, indicating the height and width and the appropriate units ( options are "in", "cm", "mm", "px").
+
+* You can also save it in a number of different formats (pdf, png, eps, svg, jpg, ...)
+
+```{r}
+ggsave("~/Dropbox (Personal)/Teaching/PPOL 563/plots/test2.pdf", width = 8.5, height = 11, units = "in")
 ```
 
 
