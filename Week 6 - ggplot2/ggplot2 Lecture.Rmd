@@ -27,11 +27,13 @@ ggplot2 builds plots in layers.  The first layer is the data.  Notice what happe
 ```{r}
 ggplot(data = gapminder)
 ```
+
 The next layer is the aesthetic layer.  Here is where you establish what variables are mapped to the x and y axis.  But notice that there’s still no actual display of the data yet!  We haven’t told it what shape to display it in.
 
 ```{r}
 ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp))
 ```
+
 Then you add the geometric layer, telling ggplot what type of geometric shape to plot.
 
 ```{r}
@@ -68,6 +70,7 @@ ggplot(data = gapminder,
        color = gdpPercap)) +
    geom_bin2d()
 ```
+
 ## Statistics and Scales
 
 Other ggplot2 building blocks:
@@ -76,6 +79,7 @@ Other ggplot2 building blocks:
 * **scale**s: legends, axes to allow reading data from a plot
 
 In the next code call,
+
 1. data = gapminder: dataframe
 2. aes(x = gdpPercap, y = lifeExp): plot variables
 3. aes(color = continent): attributes
@@ -111,6 +115,7 @@ ggplot(gapminder,
    geom_smooth() +
    scale_x_log10()
 ```
+
 ## Other Mappings
 
 Let's see how we can change a few other things:
@@ -128,6 +133,7 @@ ggplot(data = gapminder,
    geom_smooth() +
    scale_x_log10()
 ```
+
 ## Working With Color
 
 Before we move on to other ggplot2 building blocks, let's go back to a reasonable plot, and see what we can do with color.
@@ -142,6 +148,7 @@ ggplot(data = gapminder,
    scale_x_log10() +
    scale_color_manual(values = c("red", "orange", "yellow", "green", "blue"))
 ```
+
 You can (and probably should) use prebuilt color palettes.  
 
 ```{r}
@@ -188,6 +195,7 @@ Other ggplot2 building blocks:
 * **facet**ing: break a plot into subsets and display small multiples conditional on another variable
 
 In this call,
+
 1. data = gapminder: dataframe
 2. aes(x = gdpPercap, y = lifeExp): plot variables
 3. geom_point(): what to plot, with a aes(color = continent) attribute
@@ -205,6 +213,7 @@ ggplot(gapminder,
    scale_x_log10() +
    facet_wrap(~ continent)
 ```
+
 One thing you can do to make the facets (potentially) more interesting is to let the x and/or y axes vary within each plot.  You do that by passing it a `scales` argument of one of the following:
 
 * scales = "fixed": x and y scales are fixed across all panels
@@ -236,6 +245,7 @@ ggplot(d2,
    scale_x_log10() +
    facet_grid(continent ~ cool, scales = "free_y")
 ```
+
 ## Position Adjustments
 
 Other ggplot2 building blocks:
@@ -253,6 +263,7 @@ ggplot(gapminder,
    geom_point(aes(color = continent), position = "jitter") +
    scale_x_log10()
 ```
+
 Here's what it would look like without the `position = jitter` call.
 
 ```{r}
@@ -261,6 +272,7 @@ ggplot(gapminder,
    geom_point(aes(color = continent)) +
    scale_x_log10()
 ```
+
 Let's make a bar chart using our data to demonstrate how position can be used.  To make the visualization a bit easier to read and handle (though it will still be a long way from great!), we are going to limit it to the top 5 countries on each continent by population in 2007. 
 
 First, here is just a regular bar chart, which automatically stacks the country bars on top of each other.  This is `position = "stack"`
@@ -302,7 +314,6 @@ gapminder %>%
    theme(legend.position = "none")
 ```
 
-
 ## More on Layers
 
 Other ggplot2 building blocks:
@@ -326,6 +337,7 @@ p1 +
    geom_smooth(method="loess", color="black", se=FALSE) +
    scale_x_log10() 
 ```
+
 ## Themes
 
 Now let's see what happens when we change a plots theme.  ggplot2 comes with a number of built-in themes that can be easily called.  Note if you haven't saved a ggplot object, `last_plot()` gives you something to work with.  
@@ -435,6 +447,7 @@ gapminder %>%
         x = "Per Capita GDP",
         y = "Life Expectancy")
 ```
+
 The other way to deal with too many labels is to filter your data.  You can label points selectively by using some criterion to assign labels to points.
 
 Here we create a loess model (which, remember is the statistical transformation we get from geom_smooth)

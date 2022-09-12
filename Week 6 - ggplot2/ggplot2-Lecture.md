@@ -48,8 +48,9 @@ happens if you JUST call that one layer…you get a blank canvas.
 ggplot(data = gapminder)
 ```
 
-![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-2-1.png)<!-- --> The
-next layer is the aesthetic layer. Here is where you establish what
+![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+The next layer is the aesthetic layer. Here is where you establish what
 variables are mapped to the x and y axis. But notice that there’s still
 no actual display of the data yet! We haven’t told it what shape to
 display it in.
@@ -58,9 +59,10 @@ display it in.
 ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp))
 ```
 
-![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-3-1.png)<!-- --> Then
-you add the geometric layer, telling ggplot what type of geometric shape
-to plot.
+![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+Then you add the geometric layer, telling ggplot what type of geometric
+shape to plot.
 
 ``` r
 ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
@@ -101,8 +103,9 @@ ggplot(data = gapminder,
    geom_bin2d()
 ```
 
-![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-6-1.png)<!-- --> \##
-Statistics and Scales
+![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+## Statistics and Scales
 
 Other ggplot2 building blocks:
 
@@ -110,12 +113,16 @@ Other ggplot2 building blocks:
     binning & counting, …
 -   **scale**s: legends, axes to allow reading data from a plot
 
-In the next code call, 1. data = gapminder: dataframe 2. aes(x =
-gdpPercap, y = lifeExp): plot variables 3. aes(color = continent):
-attributes 4. geom_point(): what to plot 5. geom_smooth(): a statistical
-transformation fits the data to a loess smoother, and then returns
-predictions from evenly spaced points within the range of the data. 6.
-scale_x\_log10(): transforms the X axis into log scale.
+In the next code call,
+
+1.  data = gapminder: dataframe
+2.  aes(x = gdpPercap, y = lifeExp): plot variables
+3.  aes(color = continent): attributes
+4.  geom_point(): what to plot
+5.  geom_smooth(): a statistical transformation fits the data to a loess
+    smoother, and then returns predictions from evenly spaced points
+    within the range of the data.
+6.  scale_x\_log10(): transforms the X axis into log scale.
 
 -   the coordinate system is taken to be the standard Cartesian (x,y)
 -   note that color is “inherited” by geom_smooth, so there are 5 trend
@@ -156,8 +163,9 @@ ggplot(gapminder,
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-8-1.png)<!-- --> \##
-Other Mappings
+![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+## Other Mappings
 
 Let’s see how we can change a few other things:
 
@@ -181,8 +189,9 @@ ggplot(data = gapminder,
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-9-1.png)<!-- --> \##
-Working With Color
+![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+## Working With Color
 
 Before we move on to other ggplot2 building blocks, let’s go back to a
 reasonable plot, and see what we can do with color.
@@ -202,8 +211,9 @@ ggplot(data = gapminder,
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-10-1.png)<!-- --> You
-can (and probably should) use prebuilt color palettes.
+![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+You can (and probably should) use prebuilt color palettes.
 
 ``` r
 p2 <- ggplot(data = gapminder, 
@@ -275,14 +285,17 @@ colorblindr::cvd_grid(p3)
 Other ggplot2 building blocks: \* **facet**ing: break a plot into
 subsets and display small multiples conditional on another variable
 
-In this call, 1. data = gapminder: dataframe 2. aes(x = gdpPercap, y =
-lifeExp): plot variables 3. geom_point(): what to plot, with a aes(color
-= continent) attribute 4. geom_smooth(): a statistical transformation
-fits the data to a loess smoother, and then returns predictions from
-evenly spaced points within the range of the data. 5. scale_x\_log10():
-transforms the X axis into log scale. 6. facet_wrap: breaks the plot
-into subsets and display small multiples conditional on the continent
-variable.
+In this call,
+
+1.  data = gapminder: dataframe
+2.  aes(x = gdpPercap, y = lifeExp): plot variables
+3.  geom_point(): what to plot, with a aes(color = continent) attribute
+4.  geom_smooth(): a statistical transformation fits the data to a loess
+    smoother, and then returns predictions from evenly spaced points
+    within the range of the data.
+5.  scale_x\_log10(): transforms the X axis into log scale.
+6.  facet_wrap: breaks the plot into subsets and display small multiples
+    conditional on the continent variable.
 
 -   note that each plot separately uses all of the calls , so there are
     separate geom_smooth lines for each subsetted plot
@@ -298,10 +311,11 @@ ggplot(gapminder,
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
-![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-15-1.png)<!-- --> One
-thing you can do to make the facets (potentially) more interesting is to
-let the x and/or y axes vary within each plot. You do that by passing it
-a `scales` argument of one of the following:
+![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+One thing you can do to make the facets (potentially) more interesting
+is to let the x and/or y axes vary within each plot. You do that by
+passing it a `scales` argument of one of the following:
 
 -   scales = “fixed”: x and y scales are fixed across all panels
 -   scales = “free_x”: the x scale is free, and the y scale is fixed
@@ -342,8 +356,9 @@ ggplot(d2,
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
-![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-17-1.png)<!-- --> \##
-Position Adjustments
+![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+## Position Adjustments
 
 Other ggplot2 building blocks: \* **pos**ition adjustments: jitter,
 dodge, stack…
@@ -369,6 +384,7 @@ ggplot(gapminder,
 ```
 
 ![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
 Here’s what it would look like without the `position = jitter` call.
 
 ``` r
@@ -379,6 +395,7 @@ ggplot(gapminder,
 ```
 
 ![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
 Let’s make a bar chart using our data to demonstrate how position can be
 used. To make the visualization a bit easier to read and handle (though
 it will still be a long way from great!), we are going to limit it to
@@ -476,8 +493,9 @@ p1 +
     ## `geom_smooth()` using formula 'y ~ x'
     ## `geom_smooth()` using formula 'y ~ x'
 
-![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-23-1.png)<!-- --> \##
-Themes
+![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+
+## Themes
 
 Now let’s see what happens when we change a plots theme. ggplot2 comes
 with a number of built-in themes that can be easily called. Note if you
@@ -666,9 +684,10 @@ gapminder %>%
     ## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
     ## increasing max.overlaps
 
-![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-34-1.png)<!-- --> The
-other way to deal with too many labels is to filter your data. You can
-label points selectively by using some criterion to assign labels to
+![](ggplot2-Lecture_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
+
+The other way to deal with too many labels is to filter your data. You
+can label points selectively by using some criterion to assign labels to
 points.
 
 Here we create a loess model (which, remember is the statistical
