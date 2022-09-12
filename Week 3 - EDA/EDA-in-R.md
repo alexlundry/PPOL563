@@ -6,7 +6,7 @@ For this demonstration and the ensuing exercise we will be using the
 
 ``` r
 # install.packages("gapminder")
-#load necessary libraries
+# load necessary libraries
 library(tidyverse)
 ```
 
@@ -37,8 +37,8 @@ Using R’s built-in help function gives us helpful information:
 help(package = "gapminder")
 ```
 
-From here, we can see there are two datasets available: ‘gapminder’ and
-‘gapminder_unfiltered’. We can again use the help option to get more
+From here, we can see there are two datasets available: `gapminder` and
+`gapminder_unfiltered`. We can again use the help option to get more
 information:
 
 ``` r
@@ -48,12 +48,12 @@ help(gapminder_unfiltered)
 
 From here, it’s helpful to get a bird’s eye view of the datasets.
 
-This is easily accomplished with the ‘glimpse’ function. The function
+This is easily accomplished with the `glimpse` function. The function
 provides us with a succinct look at the row and column count, each
 variable and it’s corresponding type, and a brief look at the first few
 observations.
 
-Here it is for the ‘gapminder’ dataset:
+Here it is for the `gapminder` dataset:
 
 ``` r
 glimpse(gapminder)
@@ -110,8 +110,8 @@ variables themselves, asking yourself a few key questions:
 How we understand the variation will depend upon whether the variable is
 categorical or continuous.
 
-There are two categorical variables in our data: ‘country’ and
-‘continent’. For each, a simple bar chart will tell us a lot:
+There are two categorical variables in our data: `country` and
+`continent`. For each, a simple bar chart will tell us a lot:
 
 ``` r
 ggplot(gapminder_unfiltered, aes(continent)) +
@@ -239,7 +239,7 @@ ggplot(d1, aes(fct_infreq(country))) +
 
 Now let’s focus on understanding our continuous variables. (We’ll
 continue to use the unfiltered data just to simulate EDA on a larger
-dataset). Here we’ll look specifically at ‘gdpPercap’. First step here
+dataset). Here we’ll look specifically at `gdpPercap`. First step here
 is to run a basic histogram to get a sense of the “shape” of the data:
 
 ``` r
@@ -294,7 +294,7 @@ Here’s a great description of how they work:
 ### Cotinuous / Categorical interaction
 
 There’s probably some big variation here depending upon other factors
-like ‘region’ so let’s look at that by using ‘facet_wrap()’ a VERY
+like `region` so let’s look at that by using `facet_wrap()` a VERY
 useful tool for EDA that panels your plot by a categorical variable of
 your choosing:
 
@@ -342,7 +342,7 @@ ggplot(gapminder_unfiltered, aes(x = reorder(continent, gdpPercap, FUN = median)
 ![](EDA-in-R_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 Let’s revisit the facet, but instead of using counts, we can use
-‘..density..’ as the y argument in the ‘aes’ function:
+`..density..` as the y argument in the `aes` function:
 
 ``` r
 ggplot(gapminder_unfiltered, aes(gdpPercap, ..density..)) +
@@ -355,9 +355,9 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, ..density..)) +
 ![](EDA-in-R_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 You’ll notice that in this and the previous facet examples, the facets’
-axes were fixed. You can change this in an argument to ‘facet_wrap’,
-where you can set ‘scales = “free”’ to have both x and y vary in each
-facet, or you could also set them either ‘free_x’ or ‘free_y’:
+axes were fixed. You can change this in an argument to `facet_wrap`,
+where you can set `scales = "free"` to have both x and y vary in each
+facet, or you could also set them either `free_x` or `free_y`:
 
 ``` r
 ggplot(gapminder_unfiltered, aes(gdpPercap, ..density..)) +
@@ -371,7 +371,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, ..density..)) +
 
 ### Numeric / Numeric interaction
 
-A very useful option for visual EDA is the ‘pairs’ function that comes
+A very useful option for visual EDA is the `pairs` function that comes
 as part of R’s base graphics option:
 
 ``` r
@@ -385,7 +385,7 @@ that text box has that variable as the X axis, while each of the
 graphics in the column of that text box has that variable as the Y-axis.
 
 Of course, it’s still pretty hard to understand - the boxes are small
-and the ‘country’ and ‘continent’ graphs are odd because they’re
+and the `country` and `continent` graphs are odd because they’re
 categorical data. Let’s get rid of them using a smart select function:
 
 ``` r
@@ -417,7 +417,7 @@ More specifically, you are going to engage in an iterative cycle of:
 -   Use what you learn to refine your questions and/or generate new
     questions.
 
-Let’s look specifically at the first pattern we noticed in the ‘pairs’
+Let’s look specifically at the first pattern we noticed in the `pairs`
 chart above - the relationship between GDP and life expectancy.
 
 ``` r
