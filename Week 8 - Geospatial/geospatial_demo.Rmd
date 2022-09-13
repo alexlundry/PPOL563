@@ -1,0 +1,81 @@
+---
+title: "Mapping Demo"
+author: "Alex Lundry"
+date: "2022-09-13"
+output: html_document
+---
+
+There are several ways to create a map in R, and there is a great deal you can do with geo-spatial data in terms of geocomputation and spatial analysis.  BUT, those are incredibly dense subjects that take up entire degree programs in and of themselves, so we must be thoughtful about what we spend time on.  For the purposes of this course, we will focus on the construction of two types of maps: Choropleth maps and cartograms.  These are the two that you will most likely be called upon to create in the world of public policy.  
+
+We'll rely upon several packages along the way:
+```{r}
+library(tidyverse)
+library(maps)
+```
+
+We'll be using `ggplot2` for our map creation, but in order to do so, we need to reformat the `maps` data using the function `map_data()` from `ggplot2`.  
+
+```{r}
+world_map <- map_data(map = "world")
+state_map <- map_data(map = "state")
+va_state_map <- map_data(map = "state", region = "virginia")
+county_map <- map_data(map = "county")
+va_county_map <- map_data(map = "county", region = "virginia")
+```
+
+The `map_data()` function calls `map()` (a function from the `maps` library) and then reformats the returned data, converting it to a data frame.  Notice that the first argument is the `database = ` which specifies `usa, state, county, world` and others.  The `regions = ` argument can limit the map to certain regions.
+
+Take a look at the data frame it generates:
+```{r}
+glimpse(state_map)
+```
+
+We have a stunning 15,537 rows!  Why?  Notice the columns available here, especially: long, lat, group and order.  Each row represents a specific point on the map (lat/long).  The group tells you what specific shape (state) it is a part of, and order tells you the order in which to draw lines (the border) from point to point. You need a lot of lines to draw a good-looking map!
+
+### Map Boundaries
+
+Here is an example for the polygon for the state of Virginia.  Remember how ggplot builds in layers.  Let's first just creat the plot, and then add a `geom_point` to reinforce how our data frame is just a series of locations that represent points along the border.
+```{r}
+va <- ggplot(va_state_map, aes(long, lat))
+
+va +
+   geom_point()
+```
+
+Now let's connect those lines to give us an actual border!
+```{r}
+va +
+   geom_point() +
+   geom_path(color = "blue")
+```
+
+We've got some funny business going on with the non-contiguous Delmarva peninsula, but put that aside for now.  What I'd like you to notice is that the data in `va_state_map` is already ordered by the `order` column.  This is done deliberately - it controls how the lines are connected.  If we change the order of the data, we will get a wacky result:
+```{r}
+unordered <- slice_sample(va_state_map, n = 734) #randomly reorder the rows
+
+ggplot(unordered, aes(long, lat)) + 
+   geom_path(color = "blue")
+```
+
+If you find that the data is not ordered properly (usually the result of merging datasets), just reorder `arrange()` by `group` and `order`:
+
+```{r}
+ggplot(arrange(unordered, group, order), aes (long, lat)) +
+   geom_path(color = "blue")
+```
+
+If we have map data with multiple regions/groups, then use the `group` aesthetic.
+
+```{r}
+us <- ggplot(state_map, aes(long, lat, group = group))
+
+us +
+   geom_path()
+```
+
+You could also use `geom_polygon` which is just like `geom_path` but it allows a fill color:
+```{r}
+us +
+   geom_polygon(fill = "white", color = "orange")
+```
+
