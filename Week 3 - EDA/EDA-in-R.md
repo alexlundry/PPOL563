@@ -233,7 +233,16 @@ ggplot(d1, aes(fct_infreq(country))) +
    coord_flip()
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-13-1.png)<!-- --> We can
+then filter the data down to just those countries
+
+``` r
+filtered_countries <- d1 %>% select(country) %>% as_vector()
+
+d2 <- gapminder_unfiltered %>% 
+   filter(country %in% filtered_countries,
+          year >= 1977)
+```
 
 ## Variable Understanding: Continuous Variables
 
@@ -249,7 +258,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap)) +
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 A histogram divides the x-axis into equally spaced bins and then uses
 the height of a bar to display the number of observations that fall in
@@ -271,7 +280,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap)) +
    geom_histogram(binwidth = 1000)
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 We can also use a boxplot on this, but, as you’ll see below, I don’t
 think it’s as useful as the histogram version.
@@ -282,7 +291,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap)) +
    coord_flip()
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 Boxplots are odd, but can be incredibly useful (invented by Tukey, btw).
 Here’s a great description of how they work:
@@ -291,7 +300,7 @@ Here’s a great description of how they work:
 
 ## Covariation: Analyzing relationships between variables
 
-### Cotinuous / Categorical interaction
+### Continuous / Categorical interaction
 
 There’s probably some big variation here depending upon other factors
 like `region` so let’s look at that by using `facet_wrap()` a VERY
@@ -306,7 +315,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap)) +
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 We could again do this through boxplots:
 
@@ -315,7 +324,7 @@ ggplot(gapminder_unfiltered, aes(x = continent, y = gdpPercap)) +
    geom_boxplot()
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 That’s a lot more useful than our previous histogram. We don’t have as
 much information as we got with the faceted bars, but everything is more
@@ -329,7 +338,7 @@ ggplot(gapminder_unfiltered, aes(x = reorder(continent, gdpPercap, FUN = median)
    geom_boxplot()
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 Flipping this might also help:
 
@@ -339,7 +348,7 @@ ggplot(gapminder_unfiltered, aes(x = reorder(continent, gdpPercap, FUN = median)
    coord_flip()
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 Let’s revisit the facet, but instead of using counts, we can use
 `..density..` as the y argument in the `aes` function:
@@ -352,7 +361,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, ..density..)) +
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 You’ll notice that in this and the previous facet examples, the facets’
 axes were fixed. You can change this in an argument to `facet_wrap`,
@@ -367,7 +376,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, ..density..)) +
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ### Numeric / Numeric interaction
 
@@ -378,7 +387,7 @@ as part of R’s base graphics option:
 pairs(gapminder_unfiltered)
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 Each text box represents a variable, each of the graphics in the row of
 that text box has that variable as the X axis, while each of the
@@ -394,7 +403,7 @@ gapminder_unfiltered %>%
    pairs
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 This is easier to read; life expectancy generally increases over time
 and with higher GDP, and population and GDP both increase over time.
@@ -425,7 +434,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, lifeExp)) +
    geom_point()
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
 
 This is pretty interesting! It appears as though higher GDP is
 associated with higher life expectancy, but only to a point. Let’s put a
@@ -439,7 +448,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, lifeExp)) +
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 This sort of shape - where there is an obvious and single curve to the
 data - makes me think that log-transforming the data might make sense.
@@ -453,7 +462,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, lifeExp)) +
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
 This gives us a nice linear relationship.
 
@@ -470,7 +479,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, lifeExp)) +
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
 
 You might also think about how it varies by year. We can add year to the
 previous chart encoded by color:
@@ -485,7 +494,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, lifeExp)) +
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
 This helps. You can see that a lot of the darker (older) dots are lower
 on the life expectancy axis, while lighter (newer) are higher. Let’s do
@@ -503,7 +512,7 @@ gapminder_unfiltered %>%
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
 
 That confirms what we expected, though certainly there are some
 interesting outliers.
