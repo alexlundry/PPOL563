@@ -233,11 +233,12 @@ ggplot(d1, aes(fct_infreq(country))) +
    coord_flip()
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-13-1.png)<!-- --> We can
-then filter the data down to just those countries
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+We can then filter the data down to just those countries
 
 ``` r
-filtered_countries <- d1 %>% select(country) %>% as_vector()
+filtered_countries <- d1 %>% select(country) %>% as_vector
 
 d2 <- gapminder_unfiltered %>% 
    filter(country %in% filtered_countries,
