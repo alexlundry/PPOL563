@@ -2,7 +2,7 @@
 title: "Mapping Demo"
 author: "Alex Lundry"
 date: "2022-09-13"
-output: html_document
+output: github_document
 ---
 
 There are several ways to create a map in R, and there is a great deal you can do with geo-spatial data in terms of geocomputation and spatial analysis.  BUT, those are incredibly dense subjects that take up entire degree programs in and of themselves, so we must be thoughtful about what we spend time on.  For the purposes of this course, we will focus on the construction of two types of maps: Choropleth maps and cartograms.  These are the two that you will most likely be called upon to create in the world of public policy.  
@@ -36,7 +36,7 @@ We have a stunning 15,537 rows!  Why?  Notice the columns available here, especi
 
 Here is an example for the polygon for the state of Virginia.  Remember how ggplot builds in layers.  Let's first just creat the plot, and then add a `geom_point` to reinforce how our data frame is just a series of locations that represent points along the border.
 ```{r}
-va <- ggplot(va_state_map, aes(long, lat))
+va <- ggplot(va_state_map, aes(long, lat, group = group))
 
 va +
    geom_point()
@@ -49,22 +49,31 @@ va +
    geom_path(color = "blue")
 ```
 
-We've got some funny business going on with the non-contiguous Delmarva peninsula, but put that aside for now.  What I'd like you to notice is that the data in `va_state_map` is already ordered by the `order` column.  This is done deliberately - it controls how the lines are connected.  If we change the order of the data, we will get a wacky result:
+Notice is that the data in `va_state_map` is already ordered by the `order` column.  This is done deliberately - it controls how the lines are connected.  If we change the order of the data, we will get a wacky result:
 ```{r}
 unordered <- slice_sample(va_state_map, n = 734) #randomly reorder the rows
 
-ggplot(unordered, aes(long, lat)) + 
+ggplot(unordered, aes(long, lat, group = group)) + 
    geom_path(color = "blue")
 ```
 
 If you find that the data is not ordered properly (usually the result of merging datasets), just reorder `arrange()` by `group` and `order`:
 
 ```{r}
-ggplot(arrange(unordered, group, order), aes (long, lat)) +
+ggplot(arrange(unordered, group, order), aes (long, lat, group = group)) +
    geom_path(color = "blue")
 ```
 
-If we have map data with multiple regions/groups, then use the `group` aesthetic.
+You may have noticed that in each call we use the `group` aesthetic.  This tells ggplot how to segment the drawing of points.  This was necessary in our Virginia maps because there is non-contiguous territory.  Take a look at what happens if we didn't use the `group` aesthetic:
+
+```{r}
+ggplot(va_state_map, aes(long, lat)) +
+   geom_path()
+```
+
+We get that funky line connecting the Delmarva peninsula to Northern Virginia.  If we were mapping an entirely contiguous territory, such as Kentucky, we could get away without the group aesthetic.  But probably just better to include it no matter what.  
+
+Now, the `group` aesthetic is especially useful if we have map data with multiple regions/groups.  Take, for example, showing the states on a US map.  
 
 ```{r}
 us <- ggplot(state_map, aes(long, lat, group = group))
@@ -73,11 +82,220 @@ us +
    geom_path()
 ```
 
-You could also use `geom_polygon` which is just like `geom_path` but it allows a fill color:
+We've been using `geom_path`, but you could also use `geom_polygon` which is just like `geom_path` but it allows a fill color:
+
 ```{r}
 us +
    geom_polygon(fill = "white", color = "orange")
 ```
+
+### Map Projections
+
+You may have noticed that our maps don't look quite right.  Look at that razor sharp edge on the Northern border with Canada!  That ain't right.  We need to use a map projection to better display a non-flat Earth on a flat surface. Transformations (or spatial projections) can help show a map with better proportions.
+
+```{r}
+usmap = us + geom_polygon(fill="white", color="black") # initial map object
+
+#- default coord_map(): mercator projection
+usmap + coord_map() + ggtitle("Mercator")
+```
+```{r}
+#- polyconic projection
+usmap + coord_map("polyconic") + ggtitle("Polyconic")
+```
+```{r}
+#- albers projection
+usmap + coord_map("albers", lat0=29.5, lat1=45.4) + ggtitle("Albers")
+```
+
+A few things here: notice that Mercator is the default (blegh!) and that for the Albers projection, which is one we will frequently use, we pass it two latitude parameters, lat0 and lat1. In the example above, we are using their conventional values for a US map. 
+
+### Adding Layers
+
+Remember that ggplot is a layered graphics system.  So, we can layer additional data onto the map.  Let's start with just adding some cities to the map. The `us.cities` in the `maps` package contains lat, long, and population (2006 estimate) for 1005 of the largest cities in the US. Let’s add this to our US map.
+
+```{r}
+#- Create base map
+base_map <-  ggplot(state_map, aes(x=long, y=lat)) +
+   geom_polygon(aes(group=group), fill="white", color="lightgrey") +
+   coord_map("albers", lat0=29.5, lat1=45.4)
+
+base_map
+```
+
+Notice that the group aesthetic is moved to `geom_polygon()`. If this was left in `ggplot()`, then every other geom must use the group aesthetic.  Since `geom_point()` and `geom_text()` are going to use the `us.capitals` data, there is no group designation in the initial declaration.
+
+```{r}
+# get us city info
+data(us.cities) # notice the `capital == 2` for state capitals; no idea why its 2 and not 1
+
+# I only want capital cities for continental US (remove Alaska and Hawaii)
+us_capitals <- us.cities %>% filter(capital==2, !country.etc %in% c("AK", "HI"))
+
+# Make the map
+base_map +
+   geom_point(data=us_capitals, color="blue", size=2) +
+   geom_text(data=us_capitals, aes(label=name),
+             size=2.5, vjust=1, hjust=1)
+```
+
+Notice that `aes(x=long, y=lat)` is inherited from `base_map` for `geom_point()` and
+`geom_text()`
+
+### Choropleth Maps
+
+Choropleth Maps are thematic maps in which areas are shaded or patterned in proportion to the measurement of the statistical variable being displayed on the map, such as population density or per-capita income. So we need to first begin by having data to display.  
+
+The easiest way to do this is simply adding a column to the map data that contains the value we want to represent with a color.  So let's do something simple and create a column that has the length of the name of the county and map this to a fill color.
+
+```{r}
+county_data_map <- county_map %>%
+   mutate(length=str_length(subregion))
+
+head(county_data_map)
+```
+
+Let's map it:
+
+```{r}
+ggplot(county_data_map, aes(x=long, y=lat, group=group)) +
+   geom_polygon(aes(fill = length), color='grey') + 
+   ggtitle("Length of County Name")
+```
+Ok!  But those borders are way too over the top, and there's no projection.  Let's clean that up:
+
+```{r}
+ggplot(county_data_map, aes(x=long, y=lat, group=group)) + # use new data_map
+   geom_polygon(aes(fill = length), color= NA) +
+   geom_path(color = "grey", size = .1, alpha = .2) +
+   coord_map("polyconic") +
+   ggtitle("Length of County Name")
+```
+
+#### Getting actual data
+
+Let's do a choropleth with some actual data.  Let's use gun violence data from Wikipedia.  The code below uses a web scraping library called `rvest` which you'll probably pick up at some point along the way, but we won't go into detail here.  
+
+```{r}
+#- get wiki table
+library(rvest) # this is web scraping library
+url <- 'https://en.wikipedia.org/wiki/Gun_violence_in_the_United_States_by_state'
+
+guns <- read_html(url) %>% # get webpage html
+   html_node("#mw-content-text > div.mw-parser-output > table:nth-child(14)") %>% # figured out the node using "inspect element" in Chrome
+   html_table()
+
+#- clean column names
+colnames(guns) = c('state','pop', 'murders_manslaughter', 'murders', 'gun_murders',
+                'hh_gun_ownership','murders_manslaughter_rate','murder_rate',
+                "gun_murder_rate")
+
+# convert data read in as characters to numerics
+guns <- guns %>% 
+   mutate(murders = as.numeric(murders), 
+          gun_murders = as.numeric(gun_murders),
+          murder_rate = as.numeric(murder_rate),
+          gun_murder_rate = as.numeric(gun_murder_rate))
+
+glimpse(guns)
+```
+
+Now we need to create a new column in our map data that takes our variable of interest (let's make it the proportion of murders that are commited by firearms.  There are a few NAs, so let's replace those with the mean for all available states.
+
+```{r}
+guns <- guns %>% 
+   mutate(prop_gun_murders = gun_murders / murders, 
+          prop_gun_murders = replace_na(prop_gun_murders, mean(prop_gun_murders, na.rm = T)),
+          prop_gun_murders_decile = cut_number(prop_gun_murders, n=10))
+
+ggplot(guns, aes(reorder(state, prop_gun_murders), prop_gun_murders)) +
+   geom_bar(stat = "identity") +
+   coord_flip()
+```
+Now that we have the variable of interest, we need to join that into the US state map data.  Take a look at the map data to see what approach our join needs to take.
+
+```{r}
+map_data(map = "state")
+```
+
+Notice that we have the state name in the `region` variable, but in all lower case.  So let's get that joined in:
+
+```{r}
+guns <- guns %>% 
+   mutate(region = str_to_lower(state))
+
+state_data <- left_join(map_data(map = "state"), guns)
+
+glimpse(state_data)
+```
+
+Now we can create the choropleth maps using what we went over earlier:
+
+```{r}
+m1 <- ggplot(state_data, aes(x=long, y=lat, group=group)) + # use new data_map
+   geom_polygon(aes(fill = prop_gun_murders), color= NA) +
+   geom_path(color = "grey", size = .1, alpha = .2) +
+   coord_map("polyconic") +
+   labs(title = "Proportion of Murders that are Gun Related by State",
+        caption = "No data available for AL, FL, IL - NAs replaced with mean ") +
+   theme_void()
+
+m1
+```
+
+Let's change the fill color scale with `scale_fill_` family of functions. We will use
+`scale_fill_gradient2()` to make a diverging color scale that resembles traffic light colors with red as the highest value, yellow set to the mean, and green as the low.
+
+```{r}
+m1 +
+   scale_fill_gradient2(low="green", mid='yellow', high="red",
+                        midpoint=mean(guns$prop_gun_murders))
+```
+Here's an alternative map using the deciles variable and some different color mechanisms, specifically the colorBrewer diverging pallette that goes from Purple (high) to Orange (low):
+
+```{r}
+ggplot(state_data, aes(x=long, y=lat, group=group)) + # use new data_map
+   geom_polygon(aes(fill = prop_gun_murders_decile), color= NA) +
+   geom_path(color = "grey", size = .1, alpha = .2) +
+   scale_fill_brewer(type = "div", palette = "PuOr", name = "") +
+   guides(fill = guide_legend(reverse = T)) +
+   coord_map("polyconic") +
+   labs(title = "Proportion of Murders that are Gun Related by State",
+        caption = "No data available for AL, FL, IL - NAs replaced with mean ") +
+   theme_void()
+```
+
+### ggmap Package
+
+```{r}
+library(ggmap)
+```
+
+To use the `ggmap` package you must have a registered API key.  To obtain an API key and enable services you have to visit [this website](https://cloud.google.com/maps-platform/).  You'll have to use a registered Google account, and use a credit card to become a verified user.  But note that account is free and your credit card should not be charged for low volume use.  Please pay attention to the details as you sign up to make sure you don't automatically end up registering for access that will cost you money!
+
+Once registered, copy that API key.  To tell ggmap about your API key, use the `register_google` function with `key = INSERTYOURKEYHERE` as the parameter.  If you want to set it permanently then add the parameter `write = TRUE`, otherwise, you'll have to reregister each time you restart R.
+
+**IMPORTANT SECURITY INFORMATION - MUST READ**
+*This comes from the ggmap documentation*
+>Users should be aware that the API key, a string of jarbled characters/numbers/symbols, is a PRIVATE key - it uniquely identifies and authenticates you to Google's services. If anyone gets your API key, they can use it to masquerade as you to Google and potentially use services that you have enabled. Since Google requires a valid credit card to use its online cloud services, this also means that anyone who obtains your key can potentially make charges to your card in the form of Google services. So be sure to not share your API key. To mitigate against users inadvertantly sharing their keys, by default ggmap never displays a user's key in messages displayed to the console.
+
+>Users should also be aware that ggmap has no mechanism with which to safeguard the private key once registered with R. That is to say, once you register your API key, any function R will have access to it. As a consequence, ggmap will not know if another function, potentially from a compromised package, accesses the key and uploads it to a third party. For this reason, when using ggmap we recommend a heightened sense of security and self-awareness: only use trusted packages, do not save API keys in script files, routinely cycle keys (regenerate new keys and retire old ones), etc. Google offers features to help in securing your API key, including things like limiting queries using that key to a particular IP address, as well as guidance on security best practices. See https://cloud.google.com/docs/authentication/api-keys#securing_an_api_key for details.
+
+
+```{r}
+us <- get_map("united states", zoom=4)
+
+ggmap(us) +
+   geom_polygon(data = state_data, aes(x = long, y = lat, fill = prop_gun_murders_decile), color = NA, alpha = 0.6) +
+   geom_path(data = state_data, aes(x = long, y = lat), color = "grey", size = .1, alpha = .2) +
+   scale_fill_brewer(type = "div", palette = "PuOr", name = "") +
+   guides(fill = guide_legend(reverse = T)) +
+   labs(title = "Proportion of Murders that are Gun Related by State",
+        caption = "No data available for AL, FL, IL - NAs replaced with mean ") +
+   theme_void()
+```
+
+
 
 ### Acknowledgements
 
