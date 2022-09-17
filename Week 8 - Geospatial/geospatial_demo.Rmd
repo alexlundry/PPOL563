@@ -271,7 +271,9 @@ ggplot(state_data, aes(x=long, y=lat, group=group)) + # use new data_map
 library(ggmap)
 ```
 
-To use the `ggmap` package you must have a registered API key.  To obtain an API key and enable services you have to visit [this website](https://cloud.google.com/maps-platform/).  You'll have to use a registered Google account, and use a credit card to become a verified user.  But note that account is free and your credit card should not be charged for low volume use.  Please pay attention to the details as you sign up to make sure you don't automatically end up registering for access that will cost you money!
+You can use the `ggmap` library to pull in tiled basemaps from different services, like Google Maps, OpenStreetMaps, or Stamen Maps.  
+
+The default uses Google Maps, and in order to do this, you must use the `ggmap` package you must have a registered API key with Google.  To obtain an API key and enable services you have to visit [this website](https://cloud.google.com/maps-platform/).  You'll have to use a registered Google account, and use a credit card to become a verified user.  But note that account is free and your credit card should not be charged for low volume use.  Please pay attention to the details as you sign up to make sure you don't automatically end up registering for access that will cost you money!
 
 Once registered, copy that API key.  To tell ggmap about your API key, use the `register_google` function with `key = INSERTYOURKEYHERE` as the parameter.  If you want to set it permanently then add the parameter `write = TRUE`, otherwise, you'll have to reregister each time you restart R.
 
@@ -281,13 +283,33 @@ Once registered, copy that API key.  To tell ggmap about your API key, use the `
 
 >Users should also be aware that ggmap has no mechanism with which to safeguard the private key once registered with R. That is to say, once you register your API key, any function R will have access to it. As a consequence, ggmap will not know if another function, potentially from a compromised package, accesses the key and uploads it to a third party. For this reason, when using ggmap we recommend a heightened sense of security and self-awareness: only use trusted packages, do not save API keys in script files, routinely cycle keys (regenerate new keys and retire old ones), etc. Google offers features to help in securing your API key, including things like limiting queries using that key to a particular IP address, as well as guidance on security best practices. See https://cloud.google.com/docs/authentication/api-keys#securing_an_api_key for details.
 
+The `ggmap` function `get_map` lets us grab a tiled base map by giving it a location and a zoom level.  It defaults to Google, but you can also designate `source = "osm"` for Open Street Map or `source = "stamen"` for Stamen maps.  For each source there are a variety of `maptype = ` options.
+
+Below we obtain a map of the US at a zoom level of 3.  I've also designated the extreme lats and longs for the continental US so we can zoom in as tightly as possible on the map we generate.
+
+Once we have the base map, we can visualize it just by calling `ggmap()` with the map object as the parameter.
 
 ```{r}
-us <- get_map("united states", zoom=4)
+us <- get_map("united states", zoom=3)
 
+left <- -124.7844079 # westernmost long in continental us
+bottom <-   24.7433195 # southernmost lat in continental us
+right <- -66.9513812 # easternmost long in continental us
+top <-  49.3457868 # northernmost lat in continental us
+
+ggmap(us)
+```
+
+Now we can take that basemap and just add to it, the same way we did earlier.  This will overlay a choropleth map on top of it.  Notice that we need to redesignate the data and aesthetic mappings in `geom_polygon` and `geom_path` because those are using different datasets and aesthetics than the ggmap.  
+
+I've added a `scale_x_continuous` and `scale_y_continuous` so that we trim the map down to only the continental US.  Otherwise, it is essentially the same code call from the previous section on choropleth maps.
+
+```{r}
 ggmap(us) +
-   geom_polygon(data = state_data, aes(x = long, y = lat, fill = prop_gun_murders_decile), color = NA, alpha = 0.6) +
-   geom_path(data = state_data, aes(x = long, y = lat), color = "grey", size = .1, alpha = .2) +
+   geom_polygon(data = state_data, aes(x = long, y = lat, group = group, fill = prop_gun_murders_decile), color = NA, alpha = 0.6) +
+   geom_path(data = state_data, aes(x = long, y = lat, group = group), color = "grey", size = .1, alpha = .2) +
+   scale_x_continuous(limits = c(left, right)) +
+   scale_y_continuous(limits = c(bottom, top)) +
    scale_fill_brewer(type = "div", palette = "PuOr", name = "") +
    guides(fill = guide_legend(reverse = T)) +
    labs(title = "Proportion of Murders that are Gun Related by State",
