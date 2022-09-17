@@ -122,6 +122,15 @@ ggplot(d1, aes(fct_infreq(country))) +
    geom_bar() +
    coord_flip()
 ```
+We can then filter the data down to just those countries 
+
+```{r}
+filtered_countries <- d1 %>% select(country) %>% as_vector()
+
+d2 <- gapminder_unfiltered %>% 
+   filter(country %in% filtered_countries,
+          year >= 1977)
+```
 
 ## Variable Understanding: Continuous Variables
 
@@ -154,7 +163,7 @@ Boxplots are odd, but can be incredibly useful (invented by Tukey, btw). Here's 
 
 ## Covariation: Analyzing relationships between variables
 
-### Cotinuous / Categorical interaction
+### Continuous / Categorical interaction
 
 There's probably some big variation here depending upon other factors like `region` so let's look at that by using `facet_wrap()` a VERY useful tool for EDA that panels your plot by a categorical variable of your choosing:
 ```{r}
