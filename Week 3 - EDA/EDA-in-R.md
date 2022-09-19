@@ -13,10 +13,8 @@ library(tidyverse)
     ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
     ## ✔ ggplot2 3.3.6      ✔ purrr   0.3.4 
     ## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
-    ## ✔ tidyr   1.2.0      ✔ stringr 1.4.1 
+    ## ✔ tidyr   1.2.1      ✔ stringr 1.4.1 
     ## ✔ readr   2.1.2      ✔ forcats 0.5.2
-
-    ## Warning: package 'tidyr' was built under R version 4.0.5
 
     ## Warning: package 'readr' was built under R version 4.0.5
 
@@ -118,9 +116,19 @@ ggplot(gapminder_unfiltered, aes(continent)) +
    geom_bar()
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-7-1.png)<!-- --> This is our
+first ggplot function in class! Thrilling. We’ll obviously be spending a
+lot more time going into great detail about this, but for now, I’ll give
+you the nickel tour. Ggplot takes as parameters a dataset, and then you
+must map it’s aesthetic components. The aesthetics are what you are
+encoding the data as. So, in this one, we are encoding continent as the
+X aesthetic (I haven’t explicitly declared it here - ggplot is really
+good at understanding what aesthetics you mean). Once we have set the
+baseline we must tell ggplot how to encode data behind continent…here we
+are telling it to show it as a bar. It’s default behavior is to render a
+count of the x aesthetic as a bar.
 
-Great, but what the heck is FSU?
+Back to the data: This bar chart is great, but what the heck is FSU?
 
 ``` r
 gapminder_unfiltered %>% 
@@ -142,6 +150,11 @@ gapminder_unfiltered %>%
     ## 9 Uzbekistan     4
 
 Aha! FSU == Former Soviet Union.
+
+We use some of our basic dplyr tools (plus the pipe!) to figure that
+out. We declare the dataset, pipe it into a filter statement, where
+continent equals FSU, and then send that to a count function for
+country.
 
 Let’s get a sense of how many countries there are and how many entries
 each has:
@@ -165,11 +178,16 @@ count(gapminder_unfiltered, country, sort = T)
     ## 10 Spain              58
     ## # … with 177 more rows
 
+We use another count function, this time on all countries, with the
+option of sort = True to see how frequently countries appear in the
+data.
+
 So we know there ar 187 unique countries and that the max number of
 observations is 58.
 
 Ok, 58 seems to be the MAX and MODAL number of entries. Let’s see how
-many countries meet that criteria:
+many countries meet that criteria by visualizing the count data table as
+a histogram.
 
 ``` r
 gapminder_unfiltered %>% 
@@ -180,7 +198,14 @@ gapminder_unfiltered %>%
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-10-1.png)<!-- --> Pipe the
+count datatable into ggplot, where we want to visualize the variable “n”
+as our X aesthetic. And how do we visualize that aesthetic? As a
+histogram.
+
+One important note here, notice that ggplot does NOT use the pipe. As
+Hadley says, it was built before the pipe was discovered, so it uses
+the + sign as it’s linking mechanism.
 
 This probably varies greatly by year. Let’s see what this looks like for
 year:
@@ -193,6 +218,10 @@ gapminder_unfiltered %>%
 ```
 
 ![](EDA-in-R_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+We pipe the dataset into a count function based on year, then pipe that
+into ggplot, here we declare two aesthetics, x and then y, year and
+n. We visualize the aesthetic as a line.
 
 Some interesting periodicity. Clearly we are getting the maximum (or
 near maximum) number of observations in years ending in 2 and 7. And
@@ -225,6 +254,11 @@ d1 <- gapminder_unfiltered %>%
    filter(n_obs >= 25)
 ```
 
+We create a new dataset called d1 by piping the unfiltered data into a
+filter function where year is \>= 1977, then for each country, we count
+(that’s the n function) how many times it shows up, and we then filter
+it to see only those countries that have 25 or more observations.
+
 Let’s see what that looks like by country:
 
 ``` r
@@ -235,11 +269,23 @@ ggplot(d1, aes(fct_infreq(country))) +
 
 ![](EDA-in-R_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
-We can then filter the data down to just those countries
+We can then filter the data down to just those countries with a few
+dplyr moves.
+
+From that filtered data set we extract just the names of the countries
+as a vector. We pipe d1 into a select statement of just the country
+variable, then turn it into a vector.
 
 ``` r
-filtered_countries <- d1 %>% select(country) %>% as_vector
+filtered_countries <- d1 %>% 
+   select(country) %>% as_vector()
+```
 
+We then take the unfiltered data, pipe that into a filter statement that
+use the very useful %in% function to filter to just those countries,
+plus the year filter.
+
+``` r
 d2 <- gapminder_unfiltered %>% 
    filter(country %in% filtered_countries,
           year >= 1977)
@@ -259,7 +305,9 @@ ggplot(gapminder_unfiltered, aes(gdpPercap)) +
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+Our aesthetic is `gdpPercap`
 
 A histogram divides the x-axis into equally spaced bins and then uses
 the height of a bar to display the number of observations that fall in
@@ -281,10 +329,15 @@ ggplot(gapminder_unfiltered, aes(gdpPercap)) +
    geom_histogram(binwidth = 1000)
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 We can also use a boxplot on this, but, as you’ll see below, I don’t
 think it’s as useful as the histogram version.
+
+Notice that the aesthetic statement is the same, but we’ve simply
+changed the geom. Now it is a geom_boxplot. I’ve also flipped the axes
+just to make it more readable, using a coord_flip function. This is a
+frequent easy change to make.
 
 ``` r
 ggplot(gapminder_unfiltered, aes(gdpPercap)) +
@@ -292,10 +345,13 @@ ggplot(gapminder_unfiltered, aes(gdpPercap)) +
    coord_flip()
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 Boxplots are odd, but can be incredibly useful (invented by Tukey, btw).
-Here’s a great description of how they work:
+Here’s a great description of how they work. The box itself represents
+the interquartile range, running from the 25th %tile to the 75th %tile,
+with the bar in the middle representing the median. The whiskers extend
+out to the farthest non-outlier point. And outliers are shown as dots.
 
 ![](https://d33wubrfki0l68.cloudfront.net/153b9af53b33918353fda9b691ded68cd7f62f51/5b616/images/eda-boxplot.png)
 
@@ -306,7 +362,8 @@ Here’s a great description of how they work:
 There’s probably some big variation here depending upon other factors
 like `region` so let’s look at that by using `facet_wrap()` a VERY
 useful tool for EDA that panels your plot by a categorical variable of
-your choosing:
+your choosing. The facet_wrap function takes a variable that you want to
+show small multiples for (or, as its called here, a facet)
 
 ``` r
 ggplot(gapminder_unfiltered, aes(gdpPercap)) +
@@ -316,7 +373,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap)) +
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 We could again do this through boxplots:
 
@@ -325,23 +382,30 @@ ggplot(gapminder_unfiltered, aes(x = continent, y = gdpPercap)) +
    geom_boxplot()
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 That’s a lot more useful than our previous histogram. We don’t have as
 much information as we got with the faceted bars, but everything is more
 compact so we can more easily compare them.
 
+Note here that we are designating an x and y aesthetic, and explicitly
+declaring it just for clarity here. No need for coord_flip because we
+have mapped the Y axis to the numeric variable.
+
 We can also do a little manipulation of this to make it slightly more
-readable:
+readable. We do this by using a reorder function in the x aesthetic
+declaration, telling it to reorder continent by gdpPercap, based on a
+median function.
 
 ``` r
 ggplot(gapminder_unfiltered, aes(x = reorder(continent, gdpPercap, FUN = median), y = gdpPercap)) +
    geom_boxplot()
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
-Flipping this might also help:
+Flipping this might also help (We could also have simply reversed the X
+and Y declarations, but this is easier (imho)).
 
 ``` r
 ggplot(gapminder_unfiltered, aes(x = reorder(continent, gdpPercap, FUN = median), y = gdpPercap)) +
@@ -349,10 +413,13 @@ ggplot(gapminder_unfiltered, aes(x = reorder(continent, gdpPercap, FUN = median)
    coord_flip()
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 Let’s revisit the facet, but instead of using counts, we can use
-`..density..` as the y argument in the `aes` function:
+`..density..` as the y argument in the `aes` function. This let’s use
+see the values as a relative measurement rather than an absolute count -
+so that we can better see the patterns in other areas. We can provide
+..density.. as the y argument in `aes`:
 
 ``` r
 ggplot(gapminder_unfiltered, aes(gdpPercap, ..density..)) +
@@ -362,7 +429,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, ..density..)) +
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 You’ll notice that in this and the previous facet examples, the facets’
 axes were fixed. You can change this in an argument to `facet_wrap`,
@@ -377,7 +444,7 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, ..density..)) +
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 ### Numeric / Numeric interaction
 
@@ -388,7 +455,7 @@ as part of R’s base graphics option:
 pairs(gapminder_unfiltered)
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 Each text box represents a variable, each of the graphics in the row of
 that text box has that variable as the X axis, while each of the
@@ -396,7 +463,9 @@ graphics in the column of that text box has that variable as the Y-axis.
 
 Of course, it’s still pretty hard to understand - the boxes are small
 and the `country` and `continent` graphs are odd because they’re
-categorical data. Let’s get rid of them using a smart select function:
+categorical data. Let’s get rid of them using a smart select function -
+the `select_if()` function and the declaration `is.numeric` - it only
+selects the numeric variables.
 
 ``` r
 gapminder_unfiltered %>% 
@@ -404,7 +473,7 @@ gapminder_unfiltered %>%
    pairs
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
 
 This is easier to read; life expectancy generally increases over time
 and with higher GDP, and population and GDP both increase over time.
@@ -430,16 +499,20 @@ More specifically, you are going to engage in an iterative cycle of:
 Let’s look specifically at the first pattern we noticed in the `pairs`
 chart above - the relationship between GDP and life expectancy.
 
+We declare these as our aesthetics and then the geom mapping we use is
+geom_point. It gives us a scatterplot.
+
 ``` r
 ggplot(gapminder_unfiltered, aes(gdpPercap, lifeExp)) +
    geom_point()
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 This is pretty interesting! It appears as though higher GDP is
 associated with higher life expectancy, but only to a point. Let’s put a
-trend line through it to see what the model tells us:
+trend line through it to see what the model tells us. We can do this
+with a simple addition of a smooth geom
 
 ``` r
 ggplot(gapminder_unfiltered, aes(gdpPercap, lifeExp)) +
@@ -449,10 +522,12 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, lifeExp)) +
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
 This sort of shape - where there is an obvious and single curve to the
 data - makes me think that log-transforming the data might make sense.
+This can be done by adding a scale_x statement; in this case
+`scale_x_log10`.
 
 ``` r
 ggplot(gapminder_unfiltered, aes(gdpPercap, lifeExp)) +
@@ -463,12 +538,13 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, lifeExp)) +
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
 
 This gives us a nice linear relationship.
 
 Let’s think about how other variables come into play here. Certainly
-this will vary by continent:
+this will vary by continent, so let’s add faceting by continent, and set
+the scales to free.
 
 ``` r
 ggplot(gapminder_unfiltered, aes(gdpPercap, lifeExp)) +
@@ -480,10 +556,12 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, lifeExp)) +
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
 You might also think about how it varies by year. We can add year to the
-previous chart encoded by color:
+previous chart encoded by color. Notice here that we are declaring an
+aesthetic in the geom_point statement, and that we are explicitly
+declaring color mapped to year.
 
 ``` r
 ggplot(gapminder_unfiltered, aes(gdpPercap, lifeExp)) +
@@ -495,11 +573,13 @@ ggplot(gapminder_unfiltered, aes(gdpPercap, lifeExp)) +
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
 
 This helps. You can see that a lot of the darker (older) dots are lower
 on the life expectancy axis, while lighter (newer) are higher. Let’s do
-a more direct comparison here between different epochs of data.
+a more direct comparison here between different epochs of data. You’ll
+see a key mutate statement up front with an ifelse statement, piped into
+ggplot.
 
 ``` r
 gapminder_unfiltered %>% 
@@ -513,7 +593,7 @@ gapminder_unfiltered %>%
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
 
 That confirms what we expected, though certainly there are some
 interesting outliers.
