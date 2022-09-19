@@ -395,7 +395,9 @@ Shapefiles are a commonly supported file type for spatial data dating back to th
 - .dbf stores data associated with the geographic features (e.g. unemployment rate, crime rates, percentage of votes cast for Donald Trump)
 - .prj stores information about the projection of the coordinates in the shapefile
 
-When importing a shapefile, you need to ensure all the files are in the same folder.
+When importing a shapefile, you need to ensure all the files are in the same folder.  This is the complete shapefile. If any of these files are missing, you will get an error importing your shapefile.
+
+The `st_read()` function turns a shapefile into a "Simple Features" dataframe that is easier to work with.  
 
 ```{r}
 library(sf)
@@ -403,9 +405,19 @@ library(sf)
 dma <- st_read("NatDMA.shp")
 ```
 
+The geom_sf() function allows you to plot geospatial objects in any ggplot2 object. Since the  
+x and y coordinates are implied by the geometry of the sf object, you don’t have to explicitly bind the x aesthetic to the longitudinal coordinate and the y aesthetic to the latitude. 
+
 ```{r}
-ggplot(dma) + 
-  geom_sf()
+m1 <- ggplot(dma) + 
+   geom_sf() +
+   coord_sf() +
+   scale_x_continuous(limits = c(left, right)) +
+   scale_y_continuous(limits = c(bottom, top))
+
+# I was having issues rendering this live in the notebook. Saving it to an object and then as a PDF got this all working much faster.     
+
+ggsave("map_demo.pdf")
 ```
 
 
