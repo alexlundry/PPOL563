@@ -116,17 +116,18 @@ ggplot(gapminder_unfiltered, aes(continent)) +
    geom_bar()
 ```
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-7-1.png)<!-- --> This is our
-first ggplot function in class! Thrilling. We’ll obviously be spending a
-lot more time going into great detail about this, but for now, I’ll give
-you the nickel tour. Ggplot takes as parameters a dataset, and then you
-must map it’s aesthetic components. The aesthetics are what you are
-encoding the data as. So, in this one, we are encoding continent as the
-X aesthetic (I haven’t explicitly declared it here - ggplot is really
-good at understanding what aesthetics you mean). Once we have set the
-baseline we must tell ggplot how to encode data behind continent…here we
-are telling it to show it as a bar. It’s default behavior is to render a
-count of the x aesthetic as a bar.
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+This is our first ggplot function in class! Thrilling. We’ll obviously
+be spending a lot more time going into great detail about this, but for
+now, I’ll give you the nickel tour. Ggplot takes as parameters a
+dataset, and then you must map it’s aesthetic components. The aesthetics
+are what you are encoding the data as. So, in this one, we are encoding
+continent as the X aesthetic (I haven’t explicitly declared it here -
+ggplot is really good at understanding what aesthetics you mean). Once
+we have set the baseline we must tell ggplot how to encode data behind
+continent…here we are telling it to show it as a bar. It’s default
+behavior is to render a count of the x aesthetic as a bar.
 
 Back to the data: This bar chart is great, but what the heck is FSU?
 
@@ -198,10 +199,11 @@ gapminder_unfiltered %>%
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](EDA-in-R_files/figure-gfm/unnamed-chunk-10-1.png)<!-- --> Pipe the
-count datatable into ggplot, where we want to visualize the variable “n”
-as our X aesthetic. And how do we visualize that aesthetic? As a
-histogram.
+![](EDA-in-R_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+Pipe the count datatable into ggplot, where we want to visualize the
+variable “n” as our X aesthetic. And how do we visualize that aesthetic?
+As a histogram.
 
 One important note here, notice that ggplot does NOT use the pipe. As
 Hadley says, it was built before the pipe was discovered, so it uses
