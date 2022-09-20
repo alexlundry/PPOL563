@@ -385,8 +385,6 @@ R has a number of built in data sets that could be helpful with maps:
 - `state.region` - factor giving the region (Northeast, South, North Central, West) that each state belongs to.
 - `state.x77` - matrix with 50 rows and 8 columns giving the following statistics in the respective columns: population in 1975, per capita income 1974, illiteracy 1970, life expectancy in years (1969-71), murder per 100K 1976, % HS grads 1970, mean number of days w/min temp below freezing (1931-1960) in capital or large city, land area in square miles.
 
-### Creating Custom Regions
-
 ### CDs and DMAs (using external shape files)
 
 Shapefiles are a commonly supported file type for spatial data dating back to the early 1990s. Proprietary software for geographic information systems (GIS) such as ArcGIS pioneered this format and helps maintain its continued usage. A shapefile encodes points, lines, and polygons in geographic space, and is actually a set of files. Shapefiles appear with a .shp extension, sometimes with accompanying files ending in .dbf and .prj.
@@ -538,6 +536,75 @@ cong_map %>%
    theme(legend.position = "none")
 ```
 
+Here is another site that has historical CD boundaries all the way back to 1789: https://cdmaps.polisci.ucla.edu/
+
+### Creating Custom Regions
+
+It is likely that you will frequently be asked to calculate statistics for custom regions, and these will frequently be made up of unique combinations of pre-existing regions like counties or states.  Here's one example from a recent project where I had to analyze some survey data in Kentucky that had to do with coal, so it was important that we understand how the various coal producing regions felt compared to non-coal producing regions.  
+
+First, I had to grab an SF object for Kentucky:
+
+```{r}
+ky <- us_counties(resolution = "high", states = "KY") %>% 
+   select(-9) # no idea why, but it has duplicate columns, so we drop one
+```
+
+
+Then I had to load in the data I had that mapped Kentucky counties to coal-producing regions.  Once that is loaded the next step is to join them together.  Always do a left_join INTO the SF object so that it remains an SF object.  
+
+```{r}
+ky_pr <- read_csv("ky_pr.csv", col_types = c("ccnccc"))
+
+ky <- left_join(ky, ky_pr, by = c("geoid" = "FIPS"))
+```
+
+Creating the new region is frighteningly easy.  Because the SF object is a tidy dataset, you can use standard **dyplyr** functions on it and it will behave as you would expect.  You'll see that the new SF object is a dataset consisting only of three records: one for each of the coal regions in our dataset. 
+
+```{r}
+ky_new <- ky %>% 
+    group_by(coal) %>% 
+    summarize()
+
+ky_new
+```
+Then it's simply a matter of calling `geom_sf` to map the new regions. Notice the use of `geom_sf_label` which we haven't seen yet - a way of labelling your mapped SF objects.
+
+```{r}
+ggplot(ky_new) +
+   geom_sf() +
+   geom_sf_label(aes(label = coal))
+```
+
+Here again, you could turn these into Choropleth maps by simply joining the data to be visualized into the SF object and then adding it as a fill aesthetic to the `geom_sf` call.
+
+### Cartograms
+
+### Statebins / Hexbins
+
+The `statebins` library was built for easy creation of US visualizations.  It creates a new ggplot geom: `geom_statebins` which is easily incorporated into a ggplot series. 
+
+Here's an example using categorical data:
+
+```{r}
+library(statebins)
+library(socviz) # so we can easily get some recent election data
+
+ggplot(election, aes(state = state, fill = winner)) +
+   geom_statebins() +
+   scale_fill_manual(values = c("blue", "red")) +
+   theme_statebins()
+```
+
+And here's an example using continuous data:
+
+```{r}
+ggplot(election, aes(state = state, fill = pct_trump)) +
+   geom_statebins() +
+   scale_fill_distiller(palette = "Reds") +
+   theme_statebins()
+```
+
+
 ### Tidycensus
 
 **tidycensus** is an R package that allows users to interface with a select number of the US Census Bureau’s data APIs and return tidyverse-ready data frames, optionally with simple feature geometry included. 
@@ -620,36 +687,10 @@ montco %>%
    scale_fill_viridis_c(option = "magma")
 ```
 
-### Cartograms
-
-### Statebins / Hexbins
-
-The `statebins` library was built for easy creation of US visualizations.  It creates a new ggplot geom: `geom_statebins` which is easily incorporated into a ggplot series. 
-
-Here's an example using categorical data:
-
-```{r}
-library(statebins)
-library(socviz) # so we can easily get some recent election data
-
-ggplot(election, aes(state = state, fill = winner)) +
-   geom_statebins() +
-   scale_fill_manual(values = c("blue", "red")) +
-   theme_statebins()
-```
-
-And here's an example using continuous data:
-
-```{r}
-ggplot(election, aes(state = state, fill = pct_trump)) +
-   geom_statebins() +
-   scale_fill_distiller(palette = "Reds") +
-   theme_statebins()
-```
-
 ### Acknowledgements
 
 - Many thanks to Michael Porter for his [geospatial tutorial](https://mdporter.github.io/ST597/lectures/13-spatial.pdf)
 - Shout out to Josh McCrain for his [tutorial](http://joshuamccrain.com/tutorials/ggplot_maps/maps_tutorial.html)
+- This stackoverflow [answer](https://stackoverflow.com/questions/57625471/create-new-geometry-on-grouped-column-in-r-sf) for helping with custom region creation.
 - The tidygeocoder package [help page](https://jessecambon.github.io/tidygeocoder/).
 - Get a lot more information about tidycensus at its [excellent website](https://walker-data.com/tidycensus/index.html)

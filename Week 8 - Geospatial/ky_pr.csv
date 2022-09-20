@@ -1,0 +1,121 @@
+﻿FIPS,CNAME,PR,pr_name,coal,coal_overall
+21029,BULLITT,1,Louisville MSA,None,None
+21111,JEFFERSON,1,Louisville MSA,None,None
+21185,OLDHAM,1,Louisville MSA,None,None
+21015,BOONE,2,Cincinnati Bedroom,None,None
+21037,CAMPBELL,2,Cincinnati Bedroom,Eastern Coal,Coal
+21117,KENTON,2,Cincinnati Bedroom,None,None
+21001,ADAIR,3,South Central,None,None
+21003,ALLEN,3,South Central,None,None
+21013,BELL,3,South Central,Eastern Coal,Coal
+21045,CASEY,3,South Central,None,None
+21051,CLAY,3,South Central,Eastern Coal,Coal
+21053,CLINTON,3,South Central,None,None
+21057,CUMBERLAND,3,South Central,None,None
+21065,ESTILL,3,South Central,None,None
+21079,GARRARD,3,South Central,None,None
+21087,GREEN,3,South Central,None,None
+21109,JACKSON,3,South Central,Eastern Coal,Coal
+21121,KNOX,3,South Central,Eastern Coal,Coal
+21125,LAUREL,3,South Central,Eastern Coal,Coal
+21129,LEE,3,South Central,Eastern Coal,Coal
+21131,LESLIE,3,South Central,Eastern Coal,Coal
+21137,LINCOLN,3,South Central,None,None
+21147,MCCREARY,3,South Central,Eastern Coal,Coal
+21171,MONROE,3,South Central,None,None
+21189,OWSLEY,3,South Central,Eastern Coal,Coal
+21199,PULASKI,3,South Central,None,None
+21203,ROCKCASTLE,3,South Central,None,None
+21207,RUSSELL,3,South Central,None,None
+21217,TAYLOR,3,South Central,None,None
+21231,WAYNE,3,South Central,None,None
+21235,WHITLEY,3,South Central,Eastern Coal,Coal
+21007,BALLARD,4,Western Kentucky,None,None
+21033,CALDWELL,4,Western Kentucky,None,None
+21035,CALLOWAY,4,Western Kentucky,None,None
+21039,CARLISLE,4,Western Kentucky,None,None
+21055,CRITTENDEN,4,Western Kentucky,Western Coal,Coal
+21059,DAVIESS,4,Western Kentucky,Western Coal,Coal
+21075,FULTON,4,Western Kentucky,None,None
+21083,GRAVES,4,Western Kentucky,None,None
+21091,HANCOCK,4,Western Kentucky,None,None
+21101,HENDERSON,4,Western Kentucky,Western Coal,Coal
+21105,HICKMAN,4,Western Kentucky,None,None
+21107,HOPKINS,4,Western Kentucky,Western Coal,Coal
+21139,LIVINGSTON,4,Western Kentucky,None,None
+21141,LOGAN,4,Western Kentucky,None,None
+21143,LYON,4,Western Kentucky,None,None
+21145,MCCRACKEN,4,Western Kentucky,None,None
+21149,MCLEAN,4,Western Kentucky,Western Coal,Coal
+21157,MARSHALL,4,Western Kentucky,None,None
+21177,MUHLENBERG,4,Western Kentucky,Western Coal,Coal
+21213,SIMPSON,4,Western Kentucky,None,None
+21219,TODD,4,Western Kentucky,None,None
+21221,TRIGG,4,Western Kentucky,None,None
+21225,UNION,4,Western Kentucky,Western Coal,Coal
+21233,WEBSTER,4,Western Kentucky,Western Coal,Coal
+21005,ANDERSON,5,Balance of State,None,None
+21009,BARREN,5,Balance of State,None,None
+21011,BATH,5,Balance of State,None,None
+21017,BOURBON,5,Balance of State,None,None
+21019,BOYD,5,Balance of State,Eastern Coal,Coal
+21021,BOYLE,5,Balance of State,None,None
+21023,BRACKEN,5,Balance of State,None,None
+21025,BREATHITT,5,Balance of State,Eastern Coal,Coal
+21027,BRECKINRIDGE,5,Balance of State,None,None
+21031,BUTLER,5,Balance of State,Western Coal,Coal
+21041,CARROLL,5,Balance of State,None,None
+21043,CARTER,5,Balance of State,Eastern Coal,Coal
+21047,CHRISTIAN,4,Western Kentucky,Western Coal,Coal
+21049,CLARK,5,Balance of State,None,None
+21061,EDMONSON,5,Balance of State,None,None
+21063,ELLIOTT,5,Balance of State,Eastern Coal,Coal
+21067,FAYETTE,5,Balance of State,None,None
+21069,FLEMING,5,Balance of State,None,None
+21071,FLOYD,5,Balance of State,Eastern Coal,Coal
+21073,FRANKLIN,5,Balance of State,None,None
+21077,GALLATIN,5,Balance of State,None,None
+21081,GRANT,5,Balance of State,None,None
+21085,GRAYSON,5,Balance of State,None,None
+21089,GREENUP,5,Balance of State,Eastern Coal,Coal
+21093,HARDIN,5,Balance of State,None,None
+21095,HARLAN,5,Balance of State,Eastern Coal,Coal
+21097,HARRISON,5,Balance of State,None,None
+21099,HART,5,Balance of State,None,None
+21103,HENRY,5,Balance of State,None,None
+21113,JESSAMINE,5,Balance of State,None,None
+21115,JOHNSON,5,Balance of State,Eastern Coal,Coal
+21119,KNOTT,5,Balance of State,Eastern Coal,Coal
+21123,LARUE,5,Balance of State,None,None
+21127,LAWRENCE,5,Balance of State,Eastern Coal,Coal
+21133,LETCHER,5,Balance of State,Eastern Coal,Coal
+21135,LEWIS,5,Balance of State,None,None
+21151,MADISON,5,Balance of State,None,None
+21153,MAGOFFIN,5,Balance of State,Eastern Coal,Coal
+21155,MARION,5,Balance of State,None,None
+21159,MARTIN,5,Balance of State,Eastern Coal,Coal
+21161,MASON,5,Balance of State,None,None
+21163,MEADE,5,Balance of State,None,None
+21165,MENIFEE,5,Balance of State,Eastern Coal,Coal
+21167,MERCER,5,Balance of State,None,None
+21169,METCALFE,5,Balance of State,None,None
+21173,MONTGOMERY,5,Balance of State,None,None
+21175,MORGAN,5,Balance of State,Eastern Coal,Coal
+21179,NELSON,5,Balance of State,None,None
+21181,NICHOLAS,5,Balance of State,None,None
+21183,OHIO,5,Balance of State,Western Coal,Coal
+21187,OWEN,5,Balance of State,None,None
+21191,PENDLETON,5,Balance of State,None,None
+21193,PERRY,5,Balance of State,Eastern Coal,Coal
+21195,PIKE,5,Balance of State,Eastern Coal,Coal
+21197,POWELL,5,Balance of State,None,None
+21201,ROBERTSON,5,Balance of State,None,None
+21205,ROWAN,5,Balance of State,None,None
+21209,SCOTT,5,Balance of State,None,None
+21211,SHELBY,5,Balance of State,None,None
+21215,SPENCER,5,Balance of State,None,None
+21223,TRIMBLE,5,Balance of State,None,None
+21227,WARREN,5,Balance of State,None,None
+21229,WASHINGTON,5,Balance of State,None,None
+21237,WOLFE,5,Balance of State,None,None
+21239,WOODFORD,5,Balance of State,None,None
