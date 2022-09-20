@@ -357,7 +357,7 @@ We can then take these points and place them on a world map.  Note that below we
 
 ```{r}
 ggplot(lat_longs, aes(longitude, latitude), color = "grey99") +
-  borders("world") + geom_point() +
+  borders("world") + geom_point(color = "red") +
   theme_void()
 ```
 
@@ -395,7 +395,21 @@ Shapefiles are a commonly supported file type for spatial data dating back to th
 
 When importing a shapefile, you need to ensure all the files are in the same folder.  This is the complete shapefile. If any of these files are missing, you will get an error importing your shapefile.
 
-The `st_read()` function turns a shapefile into a "Simple Features" dataframe that is easier to work with.  
+In order to read shape files, we'll be using a function from **sf** library, which is an incredibly useful way to create maps in R.  In fact, it's probably the one you'll be using the most.  Yes, above we used regular ggplot, and that is helpful for you to know, but it's **sf** which will give you robust functionality.  So that being said, here's a very quick intro to **sf**:
+
+From the sf vignette:
+
+>Simple features or simple feature access refers to a formal standard (ISO 19125-1:2004) that describes how objects in the real world can be represented in computers, with emphasis on the spatial geometry of these objects. It also describes how such objects can be stored in and retrieved from databases, and which geometrical operations should be defined for them.
+
+The sf package is an R implementation of Simple Features. This package incorporates:
+
+- a new spatial data class system in R
+- functions for reading and writing data
+- tools for spatial operations on vectors
+
+Most of the functions in this package starts with prefix st_ which stands for *spatial* and *temporal.*
+
+We will use the `st_read()` function to turn a shapefile into a "Simple Features" dataframe that is easier to work with.  
 
 ```{r}
 library(sf)
@@ -403,7 +417,9 @@ library(sf)
 dma <- st_read("NatDMA.shp")
 ```
 
-The geom_sf() function allows you to plot geospatial objects in any ggplot2 object. Since the x and y coordinates are implied by the geometry of the sf object, you don’t have to explicitly bind the x aesthetic to the longitudinal coordinate and the y aesthetic to the latitude. 
+sf objects usually have two types - sf and data.frame. Two main differences comparing to a regular data.frame object are spatial metadata (geometry type, dimension, bbox, epsg (SRID), proj4string) and an additional column - typically named geometry.  That geometry column is what contains all the points to draw the polygons.
+
+The `geom_sf()` function allows you to plot geospatial objects in any ggplot2 object. Since the x and y coordinates are implied by the geometry of the sf object, you don’t have to explicitly bind the x aesthetic to the longitudinal coordinate and the y aesthetic to the latitude. 
 
 To make the plot somewhat more manageable, I've limited the X and Y axes to the continental United States (CONUS).  
 
@@ -428,7 +444,6 @@ va_dma_sf <- dma %>%
    filter(Key %in% va_dma_fips) %>% 
    mutate(key = as.numeric(Key)) %>% # the key comes in as a string, but we'll want to convert it to numeric so we can join on it later with another dataset
    select(-Key)
-
 ```
 
 We'll be visualizing the results of the 2020 presidential election by DMA.  We obtain the data from a Daily Kos spreadsheet hosted on Google Sheets, so we use the `googlesheets4` a library that can download data from there.  We have to provide the URL, the sheet number, a specific range to avoid a wonky header row, and the specific range so that we only get 2020. We then filter that data down the just the Virginia DMAs. The Daily Kos data didn't come with FIPs code, so we have to manually get it in there.  I just looked at the order and listed out the correct FIPs code in the appropriate order.  I then used a very convenient function from the `janitor` library called `clean_names()` that does things like get rid of spaces and special characters and capital letters.
@@ -475,21 +490,45 @@ va_basemap <- get_map(location = "Virginia", zoom = 6)
 ggmap(va_basemap)
 ```
 
-Once we have the basemap, we can layer on other maps.  Here we've layered on a polygon state border by filtering the state map data to just Virginia, and then we layer on our SF based map. 
+Once we have the basemap, we can layer on other maps.  This SHOULD be easy, but it's not.  **ggmap** brings back map objects that are built using a Coordinate Reference System that is EPSG: 3857.  But our VA DMA data map is EPSG: 4326.  This is some real "inside baseball" when it comes to mapping, but if we were to overlay these two different CRSs together, the maps would be slightly off.  So we need to do two things:
+
+1. Convert our VA DMA map into a CRS of 3857.  We can do that with a function from **sf**: `st_transform`.
+2. We then have to do some ridiculous transformation of the ggmap object too.  There is a bug with ggmap in which the bounding box that it brings back is encoded in EPSG: 4326.  We use a function we found online to convert that back to EPSG: 3857 which is what all other data in ggmap is in.  
+
+These allow us to layer the SF based VA DMA map onto the ggmap base map. 
 
 ```{r}
-va_plot2 <- ggmap(va_basemap) +
-   geom_polygon(data=map_data("state") %>% filter(region == "virginia"), 
-                aes(x=long, y=lat, group=group)) +
-   geom_sf(data = va_dma_20, aes(fill = biden_percent), 
-           color = "light grey", alpha = 0.9, inherit.aes = F) +
-   scale_fill_distiller(palette = "Blues") +
-   coord_sf(crs = st_crs(4326))
+# Define a function to fix the bbox to be in EPSG:3857
+# See https://github.com/dkahle/ggmap/issues/160#issuecomment-397055208
+ggmap_bbox_to_3857 <- function(map) {
+  if (!inherits(map, "ggmap")) stop("map must be a ggmap object")
+  # Extract the bounding box (in lat/lon) from the ggmap to a numeric vector, 
+  # and set the names to what sf::st_bbox expects:
+  map_bbox <- setNames(unlist(attr(map, "bb")), 
+                       c("ymin", "xmin", "ymax", "xmax"))
+  
+  # Convert the bbox to an sf polygon, transform it to 3857, 
+  # and convert back to a bbox (convoluted, but it works)
+  bbox_3857 <- st_bbox(st_transform(st_as_sfc(st_bbox(map_bbox, crs = 4326)), 3857))
+  
+  # Overwrite the bbox of the ggmap object with the transformed coordinates 
+  attr(map, "bb")$ll.lat <- bbox_3857["ymin"]
+  attr(map, "bb")$ll.lon <- bbox_3857["xmin"]
+  attr(map, "bb")$ur.lat <- bbox_3857["ymax"]
+  attr(map, "bb")$ur.lon <- bbox_3857["xmax"]
+  map
+}
 
-va_plot2 <- ggplot(va_dma_20) +
-   geom_sf(aes(fill = biden_percent), color = "light grey", alpha = 0.9) +
-   geom_polygon(data=map_data("state") %>% filter(region == "virginia"), 
+va_dma_20_3857 <- st_transform(va_dma_20, crs = 3857) # transform VA DMA to EPSG 3857
+va_map_3857 <- ggmap_bbox_to_3857(va_basemap) # call the new function to fix the ggmap
+
+# plot the maps
+# CAN'T GET THE BORDER TO RENDER APPROPRIATELY
+va_plot2 <- ggmap(va_map_3857) + 
+   geom_polygon(data=map_data("state") %>% filter(region == "virginia"),
                 aes(x=long, y=lat, group=group), fill = NA, color = "black") +
+   geom_sf(data = va_dma_20_3857, aes(fill = biden_percent), 
+           color = "light grey", alpha = 0.9, inherit.aes = F) +
    scale_fill_distiller(palette = "Blues")
 
 ggsave("va_dma_plot2.pdf")
