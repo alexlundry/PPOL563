@@ -643,6 +643,82 @@ ggplot(election, aes(state = state, fill = pct_trump)) +
    theme_statebins()
 ```
 
+You should use the statebins package when you want squares and easy labeling of each shape.  But if you want hexagons and more options beyond basic 50 state mapping, you should use the **tilegramsR** package.
+
+This package provides a large number of SF objects that are easily mapped that correspond to various popular versions of tilegrams by news agencies.  There is a 50 state one from NPR that is most similar to the statebins one (but its a hexagon), but most of the rest are electoral college ones. You can see a full list here: https://bhaskarvk.github.io/tilegramsR/articles/UsingTilegramsInR.html
+
+But a few ones worth seeing:
+
+```{r}
+library(tilegramsR)
+sf_NPR1to1 %>% 
+   mutate(random_data = runif(nrow(.), 0, 1)) %>% 
+   ggplot() +
+   geom_sf(aes(fill = random_data)) +
+   geom_sf_text(aes(label = state), color = "white") +
+   scale_fill_viridis_c() +
+   theme_void() +
+   labs(title = "NPR State Hexbins")
+```
+
+
+```{r}
+ggplot() +
+   geom_sf(data = sf_FiveThirtyEightElectoralCollege) +
+   geom_sf(# layer containing state hexagons
+      data = sf_FiveThirtyEightElectoralCollege.states,
+      color = "black",  # state boundaries
+      alpha = 0,  # transparent
+      size = 1  # thickness
+   ) +
+   theme_void() +
+   labs(title = "Five Thirty Eight Electoral College")
+```
+
+```{r}
+
+ggplot() +
+   geom_sf(data = sf_DKOS_Electoral_College_Map_v1) +
+   theme_void() +
+   labs(title = "Daily Kos Electoral College")
+```
+
+```{r}
+ggplot() +
+   geom_sf(data = sf_NPR.DemersCartogram) +
+   theme_void() +
+   labs(title = "NPR Demers Cartogram")
+```
+
+```{r}
+ggplot() +
+   geom_sf(data = sf_DKOS_Distorted_Electoral_College_Map_v1) +
+   theme_void() +
+   labs(title = "Daily Kos Distorted Electoral College Tilegram")
+```
+
+```{r}
+ggplot() +
+   geom_sf(data = sf_DKOS_CD_Hexmap_v1.1) +
+   geom_sf(# layer containing state hexagons
+      data = sf_DKOS_CD_Hexmap_v1.1.states,
+      color = "black",  # state boundaries
+      alpha = 0,  # transparent
+      size = 1  # thickness
+   ) +
+   theme_void() +
+   labs(title = "Daily Kos Congressional Districts")
+```
+
+```{r}
+ggplot() +
+   geom_sf(data = sf_DKOS_50_State_OuterHex_Tilemap_v1, fill = "red") +
+   geom_sf(data = sf_DKOS_50_State_InnerHex_Tilemap_v1, fill = "blue") +
+   theme_void() +
+   labs(title = str_wrap("Daily Kos Dual Hexagon Tilegram (good for Senate-related data", 50))
+```
+
+There are a number of other options including versions for Germany and France, as well as tilegrams made by the *Washington Post*, the *Wall Street Journal* and *Datamap.io*.
 
 ### Tidycensus
 
