@@ -212,10 +212,11 @@ ggplot(guns, aes(reorder(state, prop_gun_murders), prop_gun_murders)) +
    geom_bar(stat = "identity") +
    coord_flip()
 ```
+
 Now that we have the variable of interest, we need to join that into the US state map data.  Take a look at the map data to see what approach our join needs to take.
 
 ```{r}
-map_data(map = "state")
+map_data(map = "state") %>% head()
 ```
 
 Notice that we have the state name in the `region` variable, but in all lower case.  So let's get that joined in:
@@ -251,6 +252,7 @@ m1 +
    scale_fill_gradient2(low="green", mid='yellow', high="red",
                         midpoint=mean(guns$prop_gun_murders))
 ```
+
 Here's an alternative map using the deciles variable and some different color mechanisms, specifically the colorBrewer diverging pallette that goes from Purple (high) to Orange (low):
 
 ```{r}
@@ -279,6 +281,7 @@ Once registered, copy that API key.  To tell ggmap about your API key, use the `
 
 **IMPORTANT SECURITY INFORMATION - MUST READ**
 *This comes from the ggmap documentation*
+
 >Users should be aware that the API key, a string of jarbled characters/numbers/symbols, is a PRIVATE key - it uniquely identifies and authenticates you to Google's services. If anyone gets your API key, they can use it to masquerade as you to Google and potentially use services that you have enabled. Since Google requires a valid credit card to use its online cloud services, this also means that anyone who obtains your key can potentially make charges to your card in the form of Google services. So be sure to not share your API key. To mitigate against users inadvertantly sharing their keys, by default ggmap never displays a user's key in messages displayed to the console.
 
 >Users should also be aware that ggmap has no mechanism with which to safeguard the private key once registered with R. That is to say, once you register your API key, any function R will have access to it. As a consequence, ggmap will not know if another function, potentially from a compromised package, accesses the key and uploads it to a third party. For this reason, when using ggmap we recommend a heightened sense of security and self-awareness: only use trusted packages, do not save API keys in script files, routinely cycle keys (regenerate new keys and retire old ones), etc. Google offers features to help in securing your API key, including things like limiting queries using that key to a particular IP address, as well as guidance on security best practices. See https://cloud.google.com/docs/authentication/api-keys#securing_an_api_key for details.
@@ -544,7 +547,7 @@ First though, some quick background on the **USAboundaries** package, which is a
 
 >This R package includes contemporary state, county, and Congressional district boundaries, as well as zip code tabulation area centroids. It also includes historical boundaries from 1629 to 2000 for states and counties from the Newberry Library’s Atlas of Historical County Boundaries, as well as historical city population data from Erik Steiner’s “United States Historical City Populations, 1790-2010.” The package has some helper data, including a table of state names, abbreviations, and FIPS codes, and functions and data to get State Plane Coordinate System projections as EPSG codes or PROJ.4 strings.
 
-Note: I had some trouble installing the **USAboundariesData** library that it needs, so I had to install it directly from Github (see syntaxt below).
+Note: I had some trouble installing the **USAboundariesData** library that it needs, so I had to install it directly from Github (see syntax below).
 
 ```{r}
 # install.packages("USAboundariesData", repos = "https://ropensci.r-universe.dev", type = "source")
@@ -618,6 +621,65 @@ Here again, you could turn these into Choropleth maps by simply joining the data
 
 ### Cartograms
 
+Cartograms are a type of map where geographic areas (states, regions, etc) are distorted based on a variable associated with each of those areas.  For example, a cartogram would create a larger distorted image of a state that has a very large population if that is the variable you mapped to the distortion aesthetic.  
+
+They are certainly a unique and eye-catching visualization, but they do require that viewers have a previous knowledge of the geography represented since the sizes of the areas are altered.  
+To create them we use the **cartogram** package, which works with **SF** data.  
+
+```{r}
+library(cartogram)
+```
+
+Creating these are fairly straightforward know that we know how to work with SF dataframes - in particular how to merge data we want to visualize into them.  
+
+For this demonstration, we'll just work with some **USAboundaries** data that is already in SF form and merge in the gun data we used previously  
+
+```{r}
+states_sf <- us_states(resolution = "high") %>% 
+   left_join(guns, by = c("state_name" = "state")) %>% 
+   filter(is.na(pop) == F)
+```
+
+There are three key functions in the **cartogram** package:
+
+- `cartogram_cont` - creates a contiguous cartogram, which keeps the regions together as a single larger entity.
+- `cartogram_ncont` - creates a non-contiguous cartogram.  There is no deformity or distortion of the geometry of the geography. Only sizes are modified, but this leaves gaps between regions.
+- `cartogram_dorling` - creates a Dorling cartogram, which replaces the original geography with a symbol (usually a circle) with its size reduced or enlarged based on the value chosen.
+
+Importantly, the we must give the sf object a projection before we transform it into a cartogram
+
+```{r}
+states_sf_5070 <- st_transform(states_sf, 5070)
+```
+
+Once we've done that, it's only a matter of a cartogram function call and then `geom_sf`:
+
+```{r}
+states_sf_carto_cont <- cartogram_cont(states_sf_5070 %>% 
+                                          filter(!(name %in% c("Hawaii", "Alaska"))), weight = "prop_gun_murders")
+
+ggplot(states_sf_carto_cont) +
+   geom_sf()
+```
+
+```{r}
+states_sf_carto_ncont <- cartogram_ncont(states_sf_5070 %>% 
+                                          filter(!(name %in% c("Hawaii", "Alaska"))), weight = "murders")
+
+ggplot(states_sf_carto_ncont) +
+   geom_sf()
+```
+
+
+```{r}
+states_sf_carto_dorling <- cartogram_dorling(states_sf_5070 %>% filter(is.na(gun_murders) == F,
+                                                                       !(name %in% c("Hawaii", "Alaska"))), weight = "gun_murders")
+
+ggplot(states_sf_carto_dorling) +
+   geom_sf()
+```
+
+
 ### Statebins / Hexbins
 
 The `statebins` library was built for easy creation of US visualizations.  It creates a new ggplot geom: `geom_statebins` which is easily incorporated into a ggplot series. 
@@ -639,7 +701,7 @@ And here's an example using continuous data:
 ```{r}
 ggplot(election, aes(state = state, fill = pct_trump)) +
    geom_statebins() +
-   scale_fill_distiller(palette = "Reds") +
+   scale_fill_distiller(palette = "Reds", direction = -1) +
    theme_statebins()
 ```
 
@@ -730,7 +792,7 @@ To work with tidycensus, you must obtain, keep and then set a Census API key. A 
 
 ```{r}
 library(tidycensus)
-census_api_key("YOUR API KEY GOES HERE")  # add the parameter install = TRUE if you want your API key stored in your R environment for future use
+# census_api_key("YOUR API KEY GOES HERE")  # add the parameter install = TRUE if you want your API key stored in your R environment for future use
 ```
 
 There are two major functions implemented in tidycensus: `get_decennial()`, which grants access to the 2000, 2010, and 2020 decennial US Census APIs, and `get_acs()`, which grants access to the 1-year and 5-year American Community Survey APIs.
@@ -809,3 +871,4 @@ montco %>%
 - This stackoverflow [answer](https://stackoverflow.com/questions/57625471/create-new-geometry-on-grouped-column-in-r-sf) for helping with custom region creation.
 - The tidygeocoder package [help page](https://jessecambon.github.io/tidygeocoder/).
 - Get a lot more information about tidycensus at its [excellent website](https://walker-data.com/tidycensus/index.html)
+- Simple [walk through](https://r-charts.com/spatial/cartogram-ggplot2/) of the **cartogram** package.
