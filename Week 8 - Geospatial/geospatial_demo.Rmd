@@ -662,12 +662,26 @@ ggplot(states_sf_carto_cont) +
    geom_sf()
 ```
 
+Now that's in ggplot, you can modify it to your heart's content:
+
+```{r}
+ggplot(states_sf_carto_cont) +
+   geom_sf(aes(fill = prop_gun_murders)) +
+   geom_sf_text(aes(label = state_abbr), color = "white") +
+   scale_fill_viridis_b(direction = -1) +
+   theme_void()
+```
+
+
 ```{r}
 states_sf_carto_ncont <- cartogram_ncont(states_sf_5070 %>% 
                                           filter(!(name %in% c("Hawaii", "Alaska"))), weight = "murders")
 
 ggplot(states_sf_carto_ncont) +
-   geom_sf()
+   geom_sf(aes(fill = murders)) +
+   geom_sf_text(aes(label = state_abbr), color = "white") +
+   scale_fill_viridis_b(direction = -1) +
+   theme_void()
 ```
 
 
@@ -676,7 +690,10 @@ states_sf_carto_dorling <- cartogram_dorling(states_sf_5070 %>% filter(is.na(gun
                                                                        !(name %in% c("Hawaii", "Alaska"))), weight = "gun_murders")
 
 ggplot(states_sf_carto_dorling) +
-   geom_sf()
+   geom_sf(aes(fill = gun_murders)) +
+   geom_sf_text(aes(label = state_abbr), color = "white") +
+   scale_fill_viridis_b(direction = -1) +
+   theme_void()
 ```
 
 
