@@ -451,7 +451,7 @@ m1 <- ggplot(dma) +
 ggsave("map_demo.png")
 ```
 
-![]("map_demo.png")
+![](map_demo.png)
 
 Now let's see how we can combine these new geos with what we've gone over above: choropleth maps and using base map tiles.  First, we'll filter the national DMA map just to Virginia.  We'll filter based on the `Key` value, which corresponds to an ID that is frequently used when dealing with media markets: the DMA FIPs code.  To find out which DMAs are in Virginia, you can just google "Virginia DMA map" and usually one of the first results in the image search will provide you with a list of DMAs.  That list, along with a website like https://www.spstechnical.com/DMACodes.htm which has the DMA FIPs codes associated with each media market, will help you narrow things down.  
 
@@ -501,7 +501,7 @@ va_plot <- ggplot(va_dma_20, aes(fill = biden_percent)) +
 ggsave("va_dma_20_alt.png")
 ```
 
-![]("va_dma_20_alt.png")
+![](va_dma_20_alt.png)
 
 We may want to add a base map underneath it in order to help people contextualize the state better.  Especially with those DMAs that bleed over into other states.  So we can use **ggmap** to get a base map from Google of the state of Virginia.  You may have to play around with the zoom level to get the whole state (which you'll need if you want to draw a polygon, otherwise the path drawing order gets messed up because it can find all the lats and longs).  
 
@@ -557,7 +557,7 @@ va_plot2 <- ggmap(va_map_3857) +
 ggsave("va_dma_plot2.png")
 ```
 
-![]("va_dma_plot2.png")
+![](va_dma_plot2.png) 
 
 
 #### Congressional Districts: External Shape Files for Unique Boundaries
@@ -587,7 +587,7 @@ cong_plot <- ggplot(cong_map) +
 ggsave("cong_plot.png")
 ```
 
-![]("cong_plot.png")
+![](cong_plot.png)
 
 Of course, you can turn these into choropleth maps if you have CD data.  You'll just need to get the join keys to match up appropriately.  Rather than going into that here, we can just assign some random data to it and visualize appropriately.
 
