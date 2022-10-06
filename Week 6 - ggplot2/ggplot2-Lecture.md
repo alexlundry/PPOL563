@@ -24,10 +24,8 @@ library(tidyverse)
     ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
     ## ✔ ggplot2 3.3.6      ✔ purrr   0.3.4 
     ## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
-    ## ✔ tidyr   1.2.0      ✔ stringr 1.4.1 
+    ## ✔ tidyr   1.2.1      ✔ stringr 1.4.1 
     ## ✔ readr   2.1.2      ✔ forcats 0.5.2
-
-    ## Warning: package 'tidyr' was built under R version 4.0.5
 
     ## Warning: package 'readr' was built under R version 4.0.5
 
@@ -75,9 +73,12 @@ ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
 
 Now let’s really dig into it.
 
-The following code makes these calls: 1. data = gapminder: dataframe 2.
-aes(x = gdpPercap, y = lifeExp): plot variables 3. aes(color =
-continent): attributes 4. geom_point(): what to plot
+The following code makes these calls:
+
+1.  data = gapminder: dataframe
+2.  aes(x = gdpPercap, y = lifeExp): plot variables
+3.  aes(color = continent): attributes
+4.  geom_point(): what to plot
 
 -   the coordinate system is taken to be the standard Cartesian (x,y)
 
@@ -731,7 +732,7 @@ literal zoom in.
 
 Let’s see how it works when we do not clip the data.
 
-We call `coord_cartesion` and put in very high limits on both axes very
+We call `coord_cartesian` and put in very high limits on both axes very
 high, but it doesn’t get rid of the data. Notice how you can still see
 some of the labels AND the trend line is unchanged from what we had in
 the previous plot.

@@ -46,6 +46,7 @@ ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
 Now let's really dig into it.
 
 The following code makes these calls:
+
 1. data = gapminder: dataframe
 2. aes(x = gdpPercap, y = lifeExp): plot variables
 3. aes(color = continent): attributes
@@ -481,7 +482,7 @@ You can zoom in on your plots, but there are two very different ways to do that.
 
 Let's see how it works when we do not clip the data.  
 
-We call `coord_cartesion` and put in very high limits on both axes very high, but it doesn’t get rid of the data.  Notice how you can still see some of the labels AND the trend line is unchanged from what we had in the previous plot.  
+We call `coord_cartesian` and put in very high limits on both axes very high, but it doesn’t get rid of the data.  Notice how you can still see some of the labels AND the trend line is unchanged from what we had in the previous plot.  
 
 ```{r}
 p2 + 

@@ -33,7 +33,7 @@ ui <- fluidPage(theme = shinytheme("superhero"),
                                            # this is an html tag that defines a thematic break in an HTML page, typically a horizontal rule
                                            hr(), 
                                            # Now we build all the input containers
-                                           # Use a radio button to dhoose the variable to visualize
+                                           # Use a radio button to choose the variable to visualize
                                            radioButtons("variable_from_gapminder",
                                                         label = h5("Compare"),
                                                         choices = c("Population" = "pop",

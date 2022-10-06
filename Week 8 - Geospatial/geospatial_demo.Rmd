@@ -447,7 +447,7 @@ m1 <- ggplot(dma) +
    scale_x_continuous(limits = c(left, right)) +
    scale_y_continuous(limits = c(bottom, top))
 
-# The DMA shape file is massive and takes some time to fully render; this mean I was having issues rendering this live in the notebook. Saving it to an object and then as a PDF got this all working much faster.     
+# The DMA shape file is massive and takes some time to fully render; this mean I was having issues rendering this live in the notebook. Saving it to an object and then as a PNG got this all working much faster.     
 ggsave("map_demo.png")
 ```
 
