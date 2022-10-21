@@ -1,0 +1,61 @@
+source,target,weight,exchange
+C-3PO,R2-D2,17,allies
+LUKE,R2-D2,13,allies
+OBI-WAN,R2-D2,6,allies
+LEIA,R2-D2,5,allies
+HAN,R2-D2,5,allies
+CHEWBACCA,R2-D2,3,allies
+DODONNA,R2-D2,1,allies
+CHEWBACCA,OBI-WAN,7,allies
+C-3PO,CHEWBACCA,5,allies
+CHEWBACCA,LUKE,16,allies
+CHEWBACCA,HAN,19,allies
+CHEWBACCA,LEIA,11,allies
+CHEWBACCA,DARTH VADER,1,adversaries
+CHEWBACCA,DODONNA,1,allies
+CAMIE,LUKE,2,allies
+BIGGS,CAMIE,2,allies
+BIGGS,LUKE,4,allies
+DARTH VADER,LEIA,1,adversaries
+BERU,LUKE,3,allies
+BERU,OWEN,3,allies
+BERU,C-3PO,2,allies
+LUKE,OWEN,3,allies
+C-3PO,LUKE,18,allies
+C-3PO,OWEN,2,allies
+C-3PO,LEIA,6,allies
+LEIA,LUKE,17,allies
+BERU,LEIA,1,allies
+LUKE,OBI-WAN,19,allies
+C-3PO,OBI-WAN,6,allies
+LEIA,OBI-WAN,1,allies
+MOTTI,TARKIN,2,allies
+DARTH VADER,MOTTI,1,allies
+DARTH VADER,TARKIN,7,allies
+HAN,OBI-WAN,9,allies
+HAN,LUKE,26,allies
+GREEDO,HAN,1,adversaries
+HAN,JABBA,1,adversaries
+C-3PO,HAN,6,allies
+LEIA,MOTTI,1,adversaries
+LEIA,TARKIN,1,adversaries
+HAN,LEIA,13,allies
+DARTH VADER,OBI-WAN,1,adversaries
+DODONNA,GOLD LEADER,1,allies
+DODONNA,WEDGE,1,allies
+DODONNA,LUKE,1,allies
+GOLD LEADER,WEDGE,1,allies
+GOLD LEADER,LUKE,1,allies
+LUKE,WEDGE,2,allies
+BIGGS,LEIA,1,allies
+LEIA,RED LEADER,1,allies
+LUKE,RED LEADER,3,allies
+BIGGS,RED LEADER,3,allies
+BIGGS,C-3PO,1,allies
+C-3PO,RED LEADER,1,allies
+RED LEADER,WEDGE,3,allies
+GOLD LEADER,RED LEADER,1,allies
+BIGGS,WEDGE,2,allies
+RED LEADER,RED TEN,1,allies
+BIGGS,GOLD LEADER,1,allies
+LUKE,RED TEN,1,allies
