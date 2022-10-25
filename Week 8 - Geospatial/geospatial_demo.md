@@ -26,6 +26,33 @@ encounter in the public policy world:
 We’ll rely upon several packages along the way, but here are the first
 two you’ll need:
 
+``` r
+library(tidyverse)
+```
+
+    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+    ## ✔ ggplot2 3.3.6      ✔ purrr   0.3.4 
+    ## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
+    ## ✔ tidyr   1.2.1      ✔ stringr 1.4.1 
+    ## ✔ readr   2.1.2      ✔ forcats 0.5.2
+
+    ## Warning: package 'readr' was built under R version 4.0.5
+
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
+
+``` r
+library(maps)
+```
+
+    ## 
+    ## Attaching package: 'maps'
+    ## 
+    ## The following object is masked from 'package:purrr':
+    ## 
+    ##     map
+
 For our initial foray into mapmaking, we’ll be using **ggplot2** along
 with data from the **maps** package. There is a special function in
 **ggplot** that allows us to reformat `maps` data using a `map_data()`
@@ -674,7 +701,7 @@ lat_longs <- hometowns %>%
 
     ## Passing 27 addresses to the Nominatim single address geocoder
 
-    ## Query completed in: 27.1 seconds
+    ## Query completed in: 27.5 seconds
 
 ``` r
 lat_longs
@@ -748,7 +775,7 @@ glimpse(reverse)
     ## $ osm_lon          <chr> "78.6708234", "-90.0782259300085", "-87.6248273616118…
     ## $ village          <chr> "Tamia", "Mid-City", NA, NA, NA, NA, NA, NA, NA, NA, …
     ## $ county           <chr> "Tamia Tahsil", "Orleans Parish", "Cook County", "Gre…
-    ## $ state_district   <chr> "Chhindwara", NA, NA, NA, NA, NA, NA, NA, NA, "Bangal…
+    ## $ state_district   <chr> "Chhindwara", NA, NA, NA, "CAL Fire Southern Region",…
     ## $ state            <chr> "Madhya Pradesh", "Louisiana", "Illinois", "South Car…
     ## $ `ISO3166-2-lvl4` <chr> "IN-MP", "US-LA", "US-IL", "US-SC", "US-CA", "US-PA",…
     ## $ postcode         <chr> "480559", "70119", "60604", "29601", "90012", "15688"…
@@ -760,7 +787,7 @@ glimpse(reverse)
     ## $ building         <chr> NA, NA, "Congress Plaza Hotel", NA, "Los Angeles City…
     ## $ house_number     <chr> NA, NA, "500-510", "22", "200", "904", NA, "407", NA,…
     ## $ neighbourhood    <chr> NA, NA, "Printer's Row", NA, "Civic Center", NA, "Rai…
-    ## $ suburb           <chr> NA, NA, "Loop", "Downtown", "Downtown", NA, "Rakab Ga…
+    ## $ suburb           <chr> NA, NA, "Loop", "Downtown", "Chinatown", NA, "Rakab G…
     ## $ amenity          <chr> NA, NA, NA, "Trio", NA, NA, NA, "Onondaga County Sher…
     ## $ hamlet           <chr> NA, NA, NA, NA, NA, "Central", NA, NA, NA, NA, NA, NA…
     ## $ city_district    <chr> NA, NA, NA, NA, NA, NA, "Chanakya Puri Tehsil", NA, N…
@@ -899,7 +926,7 @@ m1 <- ggplot(dma) +
    scale_x_continuous(limits = c(left, right)) +
    scale_y_continuous(limits = c(bottom, top))
 
-# The DMA shape file is massive and takes some time to fully render; this mean I was having issues rendering this live in the notebook. Saving it to an object and then as a PDF got this all working much faster.     
+# The DMA shape file is massive and takes some time to fully render; this mean I was having issues rendering this live in the notebook. Saving it to an object and then as a PNG got this all working much faster.     
 ggsave("map_demo.png")
 ```
 
@@ -960,6 +987,8 @@ dma_20 <- read_sheet(ss = "https://docs.google.com/spreadsheets/d/1LomW1QYbIBzcb
     ##   <https://gargle.r-lib.org/articles/non-interactive-auth.html>
 
     ## ℹ The googlesheets4 package is using a cached token for 'alexlundry@gmail.com'.
+
+    ## Auto-refreshing stale OAuth token.
 
     ## ✔ Reading from "Presidential election results by media market, 1960-2020".
 
@@ -1630,6 +1659,7 @@ age10 %>%
 ```
 
 ![](geospatial_demo_files/figure-gfm/unnamed-chunk-63-1.png)<!-- -->
+
 There are a large number of geographies you can specify including these
 commonly used ones:
 
