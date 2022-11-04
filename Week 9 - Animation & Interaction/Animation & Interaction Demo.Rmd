@@ -43,11 +43,11 @@ print(p1)
 
 To turn it into an animation, we simply add a few functions:
 
-1.  a new labs function overwrites the previous one, so we can dynamically display the changing years as the data points move across the plot.\
-2.  the transition_time function takes in the year variable as an input and it allows the animated plot to transition frame by frame as a function of the year variable.
-3.  ease_aes function takes in linear as an input argument and it defines the transition of the frame to be in a linear fashion.\
-4.  since we saved this to p2, we now need to explicitly display it, so we call the animate function.
-5.  the anim_save function allows the rendered animated plot to a .GIF file.
+1.  a new `labs` function overwrites the previous one, so we can dynamically display the changing years as the data points move across the plot.  Note the curly brackets enclosing the variable `frame_time` that will allow the year to dynamically display.
+2.  the `transition_time` function takes in the year variable as an input and it allows the animated plot to transition frame by frame as a function of the year variable.
+3.  `ease_aes` function takes in linear as an input argument and it defines the transition of the frame to be in a linear fashion.
+4.  since we saved this to p2, we now need to explicitly display it, so we call the `animate` function.
+5.  the `anim_save` function allows the animated plot to be rendered to a .GIF file.
 
 ```{r message=FALSE, warning=FALSE}
 p2 <- p1 +
@@ -59,9 +59,29 @@ animate(p2)
 anim_save("gapminder1.gif")
 ```
 
+The `ease_aes` function defines how a value changes to another value during it's animated transition from one state to another.  Will it progress linearly, or maybe start slowly and then build up momentum?  Your ease function will determine that.  Here are the available options:
+
+- **quadratic** Models a power-of-2 function
+- **cubic** Models a power-of-3 function
+- **quartic** Models a power-of-4 function
+- **quintic** Models a power-of-5 function
+- **sine** Models a sine function
+- **circular** Models a pi/2 circle arc
+- **exponential** Models an exponential function
+- **elastic** Models an elastic release of energy
+- **back** Models a pullback and release
+- **bounce** Models the bouncing of a ball
+
+This is a good resource so you can get a sense of how different functions might behave: https://easings.net/
+
+There are also modifiers you can apply to these ease functions:
+-**in** The easing function is applied as-is
+-**out** The easing function is applied in reverse
+-**in-out** The first half of the transition it is applied as-is, while in the last half it is reversed
+
 ### Show preceding frames with gradual falloff
 
-We can use `shadow_wake()` to draw a small wake after the data by showing the latest frames up to the current. You can choose to gradually diminish the size and/or opacity of the shadow. The length of the wake is not given in absolute frames, it is given as a proportion of the total length of the animation.
+We can use `shadow_wake()` to draw a small wake after the data by showing the latest frames up to the current. You can choose to gradually diminish the size and/or opacity of the shadow. The length of the wake is not given in absolute frames, it is given as a proportion of the total length of the animation, so the one we are creating is a wake of points with the data from the last 30% of frames.  The alpha value is set here to FALSE so that the shadows are not transparent, but you can either set that to TRUE or a numeric indicating what the alpha should be.
 
 ```{r message=FALSE, warning=FALSE}
 p3 <- p2 + 
@@ -74,11 +94,12 @@ anim_save("gapminder2.gif")
 
 ### Show the original data as trail
 
-Alternatively we can use `shadow_trail()` to show the original data as a trail.
+Alternatively we can use `shadow_trail()` to show the original data as a trail.  The parameter `distance` means the animation will keep the points from 30% of
+the frames, spaced as evenly as possible.
 
 ```{r message=FALSE, warning=FALSE}
 p4 <- p2 +
-   shadow_trail()
+   shadow_trail(distance = 0.3)
 
 animate(p4)
 
@@ -87,7 +108,7 @@ anim_save("gapminder3.gif")
 
 ### Reveal data along a given dimension
 
-We've created a standard line plot of lifeExp by country, faceted by continent.
+We've created a standard line plot of lifeExp by country, filtered to just show countries in Asia.
 
 ```{r message=FALSE, warning=FALSE}
 p5 <- ggplot(gapminder %>% filter(continent == "Asia"), aes(year, lifeExp, color = country)) +
@@ -110,7 +131,10 @@ anim_save("gapminder4.gif")
 
 ### Morphing Bar Charts
 
-Here we create a bar chart and then add an additional aesthetic called `transition_states` that provides a frame variable of year. For each value of the variable, a step on the chart will be drawn.
+Here we create a bar chart and then add an additional aesthetic called `transition_states` that provides a frame variable of year. For each value of the variable, a step on the chart will be drawn. The `transition_length` tells us how long the transition should be and the `state_length` is how long it rests at a particular state.  Here they are set to be equal.  Notice that we've also changed up our `ease_aes` function to "sine-in-out."  
+
+We could just as easily have used the `transition_time` function here since we are using time as our animating variable.  If we did that, our label would instead reference `{frame_time}` instead of `{closest_state}` and we would NOT have control over the transition length or state length.  We wouldn't have that control because for `transition_time` gganimate treats the time variable as continuous, so the transition length is based on the actual values.  
+
 
 ```{r message=FALSE, warning=FALSE}
 p7 <- gapminder %>% 
@@ -128,6 +152,8 @@ anim_save("gapminder5.gif")
 ```
 
 ### Barchart Race
+
+Basically, you create an overlapping plot and you spend a lot of time getting the formatting right. Then you call gganimate!
 
 First, we get the data prepped, which includes grouping by year, sort descending by population, assigning the rank, and then filtering to the top 10 for each year.
 
@@ -149,7 +175,7 @@ Then we create a static plot:
 -   Facet by year
 -   Reverse the y scale
 -   Change the limits on X so we can display labels better.
--   Call `geom_text` for the country labels.
+-   Call `geom_text` for the country labels - this isn't a standard bar chart where the bar labels are done automatically, so we need to add a geom for the label itself.
 
 This gives us our static faceted plot.
 
@@ -173,7 +199,7 @@ p8 <- ranked_by_year %>%
 print(p8)
 ```
 
-Then we remove the facet, refine the X scale, add a numeric label text, set the group aesthetic to country and then set the `transition_time` to one year. Then we save as a GIF.
+Then we remove the facet, refine the X scale, add a numeric label text, and then set the `transition_time` to one year. Then we save as a GIF.
 
 ```{r message=FALSE, warning=FALSE}
 p8 +
@@ -182,7 +208,6 @@ p8 +
    geom_text(x = 1000, y = -9.5, 
              aes(label = as.character(year)),
              size = 30, col = "grey") +
-   aes(group = country) +
    transition_time(year)
 
 anim_save("bar_race1.gif")
@@ -190,21 +215,39 @@ anim_save("bar_race1.gif")
 
 ### Another Racing Bar Chart demo
 
-We begin by reading in the data direct from Git, select only the variables and observations we need. Then clean up the data (changing vars to numeric, renaming them), including pivoting it into a longer dataset. Then we group by year, we rank it, we get some relative values, we format a display label, and then limit it just to the top 10 for any given year. Here's what that data now looks like:
+We begin by reading in the data direct from Git.
 
 ```{r message=FALSE, warning=FALSE}
 library(janitor)
 gdp <- read_csv("https://raw.githubusercontent.com/amrrs/animated_bar_charts_in_R/master/data/GDP_Data.csv")
 
+gdp
+```
+
+Then we select only the variables and observations we need. 
+
+```{r message=FALSE, warning=FALSE}
 gdp <- gdp %>% select(3:15)
 gdp <- gdp[1:217,]
+
+gdp
+```
+
+Then clean up the data (changing vars to numeric, renaming them), including pivoting it into a longer dataset. 
+
+```{r}
 gdp_tidy <- gdp %>% 
    mutate_at(vars(contains("YR")), as.numeric) %>% 
    pivot_longer(cols = 3:13, names_to = "year") %>% 
    mutate(year = as.numeric(str_sub(year, 1, 4))) %>% 
    clean_names()
 
+gdp_tidy
+```
 
+Then we group by year, we rank it, we get some relative values, we format a display label, and then limit it just to the top 10 for any given year. Here's what that data now looks like:
+
+```{r}
 gdp_formatted <- gdp_tidy %>% 
    group_by(year) %>% 
    mutate(rank = rank(-value),
@@ -217,8 +260,8 @@ gdp_formatted
 
 From there, we build the plot. A few notes:
 
--   This version uses `geom_tile`, which is basically the same as geom_rect, they just take different arguments.
--   We use `geom_text` for the Name label.
+-   This version uses `geom_tile`, which is basically the same as `geom_rect`, they just take different arguments.  `geom_tile` uses the center of the tile and its size (x, y, width, height), versus `geom_rect` in which you need to name the four corners.
+-   We use `geom_text` for the Name label (remember, this isn't a standard bar chart where the bar labels are done automatically!)
 -   We use another `geom_text` for the value label.
 -   Call `scales` to pretty up the Y scale display
 -   Reverse the order of the X axis.
@@ -229,7 +272,7 @@ From there, we build the plot. A few notes:
 p9 <- ggplot(gdp_formatted, aes(rank, group = country_name, 
                                 fill = as.factor(country_name),
                                 color = as.factor(country_name))) +
-   geom_tile(aes(y = value/2,
+   geom_tile(aes(y = value/2, # it already has inherited X (rank) from the initial ggplot call
                  height = value,
                  width = 0.9), alpha = 0.8, color = NA) +
    geom_text(aes(y = 0, label = paste(country_name, " ")), vjust = 0.2, hjust = 1) +
@@ -259,7 +302,7 @@ p9 <- ggplot(gdp_formatted, aes(rank, group = country_name,
 print(p9)
 ```
 
-Now it's time to animate. In the code below, we set the transition state to cycle through year, take 4 times as long going to the next cut as we do pausing there. We fix the X axis, but allow Y to vary, which is the default behavior. We also set the title label to vary so that it captures the closest state (year). Finally we animate and then save it as a GIF.
+Now it's time to animate. In the code below, we set the transition state to cycle through year, take 4 times as long going to the next cut as we do pausing there. We fix the X axis, but allow Y to vary, which is the default behavior (keep in mind that it is using X and Y as inherited from the initial call, despite the fact that we called a `coord_flip`). We also set the title label to vary so that it captures the closest state (year). Finally we animate and then save it as a GIF.
 
 ```{r message=FALSE, warning=FALSE}
 p10 <- p9 +
@@ -280,7 +323,9 @@ Leaflet is a powerful open-source JavaScript library for building interactive ma
 
 The architecture is very similar to ggplot2, but instead of putting data-based layers on top of a static map, leaflet allows you to put data-based layers on top of an interactive map.
 
-A leaflet map widget is created with the `leaflet()` command. We then add layers to the widget. The first layer that we will add is a tile layer containing all of the static map information, which by default comes from OpenStreetMap. The second layer we will add here is a marker, which designates a point location. Notice how the addMarkers() function can take a data argument, just like a geom\_\*() layer in ggplot2 would.
+A leaflet map widget is created with the `leaflet()` command. We then add layers to the widget. The first layer that we will add is a tile layer containing all of the static map information, which by default comes from OpenStreetMap. The second layer we will add here is a marker, which designates a point location. Notice how the `addMarkers()` function can take a data argument, just like a geom\_\*() layer in ggplot2 would.
+
+Below, we get started by creating a data frame containing the White House and then call tidygeocoder's `geocode` function to get lat and long.  After loading the leaflet library, we create a new objeect by calling `leaflet` to create a widget, `add_tiles` and finally `addMarkers` in which we designate the data set.  
 
 ```{r message=FALSE, warning=FALSE}
 white_house <- tibble(
@@ -311,7 +356,7 @@ white_house_map %>%
              popup = ~paste0("<b>", title, "</b></br>", street_address))
 ```
 
-There are several different providers of tiles. Below we'll demonstrate two others, and we'll also see how we can set a specific view and zoom level.
+There are several different providers of tiles. Below we'll demonstrate two others, and we'll also see how we can set a specific view and zoom level by giving it a lat and long and designating the zoom level desired.
 
 ```{r message=FALSE, warning=FALSE}
 # Background 1: NASA
@@ -329,9 +374,18 @@ leaflet() %>%
    addProviderTiles("Esri.WorldImagery")
 ```
 
+Here are some especially popular provider tiles that Leaflet provides:
+- Nasa: NASAGIBS.ViirsEarthAtNight2012
+- Google map: Esri.WorldImagery
+- Gray: Esri.WorldGrayCanvas
+- Terrain: Esri.WorldTerrain
+- Topo Map: Esri.WorldTopoMap
+
+And this is a great [website](http://leaflet-extras.github.io/leaflet-providers/preview/index.html) where you can preview all the available ones.
+
 ### Choropleth Maps
 
-We'll be showing 2016 House election results in NC.
+You can create choropleth maps in Leaflet.  Here we'll be showing 2016 House election results in NC using the `fec16` package that has detailed election results.  We call their `results_house` dataset, do some clean up and then join it into their `candidates` dataset.  From there we filter to North Carolina, group by the district and create some summary variables for each CD.  
 
 ```{r message=FALSE, warning=FALSE}
 # install.packages("fec16")
@@ -366,35 +420,49 @@ ggplot(nc_map) +
    geom_sf()
 ```
 
-We need to merge in the election data with the shape file. The simplest way to do that is to use an `inner_join()`. Here we merge the nc_shp polygons with the nc_results election data frame using the district as the key.
+We need to merge in the election data with the shape file. Here we merge the nc_shp polygons with the nc_results election data frame using the district as the key.
 
 ```{r message=FALSE, warning=FALSE}
 nc_merged <- nc_map %>% 
-   mutate(district = str_remove(cd116fp, "^0+") %>% as.numeric) %>% 
-   inner_join(nc_results, by = "district")
+   mutate(district = str_remove(cd116fp, "^0+") %>% as.numeric) %>% # removing the leading zero in the CD designator 
+   left_join(nc_results, by = "district")
 
 glimpse(nc_merged)
 ```
 
-We can use Leaflet. First we will define a color palette over the values [0,1] that ranges from red to blue. According to the documentation, `colorNumeric()`:
+We can then use Leaflet. First we will define a color palette over the values [0,1] that ranges from red to blue. According to the documentation, `colorNumeric()`:
 
 > Conveniently maps data values (numeric or factor/character) to colors according to a given palette, which can be provided in a variety of formats.
 
-The `domain` parameter tells it the possible values that can be mapped.
+The palette argument can be any of the following:
+
+- A character vector of RGB or named colors. Examples: c("#000000", "#0000FF", "#FFFFFF")
+- The name of an RColorBrewer palette, e.g. "BuPu" or "Greens".
+- The full name of a viridis palette: "viridis", "magma", "inferno", or "plasma".
+- A function that receives a single value between 0 and 1 and returns a color. Examples: colorRamp(c("#000000", "#FFFFFF"), interpolate = "spline").
+
+The `domain` parameter tells it the possible values that can be mapped.  Once created it, you'll see that it simply returns a function.
 
 ```{r message=FALSE, warning=FALSE}
 pal <- colorNumeric(palette = "RdBu", domain = c(0,1))
+
+pal
 ```
 
-To make the plot in Leaflet, we have to add the tiles, and then the polygons defined by the sf object nc_merged. Since we want red to be associated with the proportion of Republican votes, we will map '1-r_prop' to color. Note that we also add popups with the actual proportions, so that if you click on the map, it will show the district number and the proportion of Republican votes.
+To make the plot in Leaflet, we have to add the tiles, and then the polygons defined by the sf object nc_merged. Since it is already an SF object, we do not need to give it any explicit polygon arguments in terms of X and Y.  Instead, we need to manipulate the weight, fillOpacity, and color, while also designating the text of the popup.  
+- The weight controls the stroke width in pixels.  
+- The fillOpacity does what you think it would, functioning essentially as an alpha argument.  
+- Since we chose a Red to Blue color pallete that mapped from 0 to 1, we actually need to flip the variable in order to associate higher values with Red.  Thus we map '1-r_prop' to color; notice how we put a tilde in front of it to indicate that it is a function call.  
+- The popup argument is also a function since it will vary based on the object.  That function creates text that shows the district number and the proportion of Republican votes.
 
 ```{r message=FALSE, warning=FALSE}
 leaflet_nc <- leaflet(nc_merged) %>% 
    addTiles() %>% 
    addPolygons(
-      weight = 1, fillOpacity = 0.7,
-      color = ~pal(1 - r_prop),
-      popup = ~paste("District", district, "</br>", round(r_prop, 4))) %>% 
+      weight = 1, 
+      fillOpacity = 0.7,
+      color = ~pal(r_prop),
+      popup = ~str_c("District ", district, "</br>", "GOP = ", round(r_prop * 100, 0), "%")) %>% 
    setView(lng = -80, lat = 35, zoom = 7)
 
 leaflet_nc
@@ -402,9 +470,9 @@ leaflet_nc
 
 ### Plotly Interactive Graphics
 
-`ggplotly`, built and maintained by plotly, allows you to convert any ggplot visualization into a plotly visualization using the `ggplotly()` function.
+`ggplotly` is a library built and maintained by Plotly that allows you to convert any ggplot visualization into a plotly visualization using the `ggplotly()` function.  It's actually quite straightforward for basic visualizations.
 
-Below we create a standard static ggplot object.
+Below we create a standard static ggplot object that creates a contour plot.
 
 ```{r message=FALSE, warning=FALSE}
 library(plotly)
@@ -417,14 +485,14 @@ p11 <- gapminder %>%
 print(p11)
 ```
 
-All you need to do is pass it the `ggplotly()` function and it creates an interactive graphic.
+All you need to do is pass it the `ggplotly()` function and it creates an interactive graphic. Notice the interactive controls that appear in the upper right corner of the graphic, as well as the hover text you get as you pass over the graphic.
 
 ```{r message=FALSE, warning=FALSE}
 p11 <- ggplotly(p11)
 p11
 ```
 
-You can also do direct plotly functions, skipping ggplot entirely. This is especially useful when they have a chart format that isn't easily available in ggplot, such as a stock candlestick chart.
+You can also do direct Plotly functions, skipping ggplot entirely. This is especially useful when they have a chart format that isn't easily available in ggplot, such as a stock candlestick chart.  Below, I use the `tidyquant` library to easily get stock information for Google, which I then pass into a `plot_ly` function.  
 
 ```{r message=FALSE, warning=FALSE}
 library(tidyquant)
@@ -440,6 +508,9 @@ prices %>%
            low = ~low, 
            split = ~symbol)
 ```
+
+For more on Plotly you can use this [cheat sheet](https://images.plot.ly/plotly-documentation/images/r_cheat_sheet.pdf?_ga=2.214086935.1631915434.1573265049-1656343979.1569706942), or you can visit the [Plotly R Open Source Graphing Library](https://plotly.com/r/).
+
 
 #### Acknowledgements
 
