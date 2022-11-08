@@ -375,6 +375,7 @@ leaflet() %>%
 ```
 
 Here are some especially popular provider tiles that Leaflet provides:
+
 - Nasa: NASAGIBS.ViirsEarthAtNight2012
 - Google map: Esri.WorldImagery
 - Gray: Esri.WorldGrayCanvas
@@ -450,6 +451,7 @@ pal
 ```
 
 To make the plot in Leaflet, we have to add the tiles, and then the polygons defined by the sf object nc_merged. Since it is already an SF object, we do not need to give it any explicit polygon arguments in terms of X and Y.  Instead, we need to manipulate the weight, fillOpacity, and color, while also designating the text of the popup.  
+
 - The weight controls the stroke width in pixels.  
 - The fillOpacity does what you think it would, functioning essentially as an alpha argument.  
 - Since we chose a Red to Blue color pallete that mapped from 0 to 1, we actually need to flip the variable in order to associate higher values with Red.  Thus we map '1-r_prop' to color; notice how we put a tilde in front of it to indicate that it is a function call.  
