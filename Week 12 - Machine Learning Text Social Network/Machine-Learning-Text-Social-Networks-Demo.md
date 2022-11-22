@@ -73,7 +73,7 @@ glimpse(d3)
 
 Now we are ready to create our first word cloud. Here we do just a
 single cloud. First, we have to load the `tidytext` library which allows
-us to extract easily extract words from the open ended text using
+us to easily extract words from the open ended text using
 `unnest_tokens`, and then we also load the `wordcloud` library for
 obvious reasons.
 
@@ -241,7 +241,7 @@ d4 %>%
    count(ideo_x, word, wt = WTFCTR, sort = T) %>%
    pivot_wider(names_from = ideo_x, values_from = n, values_fill = 0) %>% 
    column_to_rownames(var = "word") %>% 
-   comparison.cloud(colors = c("red", "blue", "grey"),
+   comparison.cloud(colors = c("blue", "grey", "red"),
                     scale = c(0.6,3),
                     max.words = 30,
                     random.order = F,
@@ -251,9 +251,6 @@ d4 %>%
 
     ## Joining, by = "word"
     ## Joining, by = "word"
-
-    ## Warning in comparison.cloud(., colors = c("red", "blue", "grey"), scale =
-    ## c(0.6, : matters could not be fit on page. It will not be plotted.
 
 ![](Machine-Learning-Text-Social-Networks-Demo_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
@@ -304,7 +301,7 @@ d3 %>%
    count(ideo_x, word, wt = WTFCTR, sort = T) %>%
    pivot_wider(names_from = ideo_x, values_from = n, values_fill = 0) %>% 
    column_to_rownames(var = "word") %>% 
-   comparison.cloud(colors = c("red", "blue", "grey"),
+   comparison.cloud(colors = c("red", "grey", "blue"),
                     scale = c(0.6,3),
                     max.words = 30,
                     random.order = F,
@@ -551,7 +548,14 @@ ggraph(swnet) +
 
 But most frequently, you’ll be drawing it with edges AND nodes. Below,
 I’ve done exactly that AND I’ve specified a different kind of layout, a
-forced layout:
+force-directed layout. These are the most popular layouts. These
+algorithms, such as Fruchterman-Reingold (used here), try to position
+the nodes so that the edges have similar length and there are as few
+crossing edges as possible. The idea is to generate “clean” layouts,
+where nodes that are closer to each other share more connections in
+common that those that are located further apart. Note that this is a
+non-deterministic algorithm: choosing a different seed will generate
+different layouts.
 
 ``` r
 # draw basic network map
@@ -647,7 +651,7 @@ ggraph(swnet, "unrooted") +
    geom_edge_link() +
    geom_node_point(aes(color = good), size = 3) + 
    geom_node_text(aes(label = name), repel=TRUE) +
-   scale_color_manual(values = c("green", "black")) +
+   scale_color_manual(values = c("black", "green")) +
    theme_graph()
 ```
 
@@ -685,13 +689,13 @@ swnet %>%
     ## # A tibble: 22 × 4
     ##    name           id good  community
     ##    <chr>       <dbl> <lgl> <chr>    
-    ##  1 R2-D2           0 TRUE  1        
-    ##  2 CHEWBACCA       1 TRUE  1        
+    ##  1 R2-D2           0 TRUE  2        
+    ##  2 CHEWBACCA       1 TRUE  2        
     ##  3 C-3PO           2 TRUE  4        
-    ##  4 LUKE            3 TRUE  2        
+    ##  4 LUKE            3 TRUE  1        
     ##  5 DARTH VADER     4 FALSE 3        
-    ##  6 CAMIE           5 TRUE  2        
-    ##  7 BIGGS           6 TRUE  2        
+    ##  6 CAMIE           5 TRUE  1        
+    ##  7 BIGGS           6 TRUE  1        
     ##  8 LEIA            7 TRUE  3        
     ##  9 BERU            8 TRUE  4        
     ## 10 OWEN            9 TRUE  4        
@@ -817,15 +821,15 @@ swnet %>%
     ## # A tibble: 22 × 5
     ##    name           id good  community centrality
     ##    <chr>       <dbl> <lgl> <chr>          <dbl>
-    ##  1 LUKE            3 TRUE  2              62.4 
+    ##  1 LUKE            3 TRUE  1              62.4 
     ##  2 LEIA            7 TRUE  3              45.6 
-    ##  3 HAN            13 TRUE  1              37   
+    ##  3 HAN            13 TRUE  2              37   
     ##  4 C-3PO           2 TRUE  4              12.1 
-    ##  5 CHEWBACCA       1 TRUE  1               7.45
-    ##  6 RED LEADER     19 TRUE  2               6.75
-    ##  7 BIGGS           6 TRUE  2               6.75
-    ##  8 OBI-WAN        10 TRUE  1               3.12
-    ##  9 R2-D2           0 TRUE  1               2.5 
+    ##  5 CHEWBACCA       1 TRUE  2               7.45
+    ##  6 RED LEADER     19 TRUE  1               6.75
+    ##  7 BIGGS           6 TRUE  1               6.75
+    ##  8 OBI-WAN        10 TRUE  2               3.12
+    ##  9 R2-D2           0 TRUE  2               2.5 
     ## 10 DARTH VADER     4 FALSE 3               2.5 
     ## # … with 12 more rows
 
@@ -850,7 +854,7 @@ ggraph(swnet, "linear") +
    geom_edge_arc(aes(color = exchange)) +
    geom_node_text(aes(label = name), repel=TRUE) +
    geom_node_point(aes(color = good), size = 3) + 
-   scale_color_manual(values = c("green", "black")) +
+   scale_color_manual(values = c("black", "green")) +
    theme_graph()
 ```
 
@@ -868,8 +872,45 @@ ggraph(swnet, "linear", circular = TRUE) +
    geom_edge_arc(aes(color = exchange)) +
    geom_node_text(aes(label = name), repel=TRUE) +
    geom_node_point(aes(color = good), size = 3) + 
-   scale_color_manual(values = c("green", "black")) +
+   scale_color_manual(values = c("black", "green")) +
    theme_graph()
 ```
 
 ![](Machine-Learning-Text-Social-Networks-Demo_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->
+
+### Other Network Calcs
+
+There are many other calculations you can make using the tidygraph
+package that could enhance your analysis, but this gets us deeper into
+Social Network Analysis that is beyond the scope of this course. Below,
+however, are my very brief notes about some of these calculations that
+could be helpful guides for further study:
+
+-   **Strength** is a weighted measure of degree that takes into account
+    the number of edges that go from one node to another. In this
+    network, it will be the total number of interactions of each
+    character with anybody else. `centrality_degree`
+-   **Closeness** measures how many steps are required to access every
+    other node from a given node. It’s a measure of how long information
+    takes to arrive (who hears news first?). `centrality_closeness`
+-   **Betweenness** measures brokerage or gatekeeping potential. It is
+    (approximately) the number of shortest paths between nodes that pass
+    through a particular node. `centrality_betweenness`
+-   **Eigenvector centrality** is a measure of being well-connected to
+    the well-connected. First eigenvector of the graph adjacency matrix.
+    Only works with undirected networks. `eigen_centrality`
+-   **Page rank** approximates probability that any message will arrive
+    to a particular node. This algorithm was developed by Google
+    founders, and originally applied to website links.
+    `centrality_pagerank`
+-   **Authority score** is another measure of centrality initially
+    applied to the Web. A node has high authority when it is linked by
+    many other nodes that are linking many other nodes.
+    `centrality_authority`
+-   Finally, not exactly a measure of centrality, but we can learn more
+    about who each node is connected to by using the following
+    functions: **neighbors** (for direct neighbors) and **ego** (for
+    neighbors up to n neighbors away) `local_members`
+
+*See “Social network analysis with R: node and network properties” by
+Alex Hanna, Pablo Barbera, Dan Cervone for more info on this*

@@ -38,7 +38,7 @@ d3 <- d3 %>%
 glimpse(d3)
 ```
 
-Now we are ready to create our first word cloud.  Here we do just a single cloud.  First, we have to load the `tidytext` library which allows us to extract easily extract words from the open ended text using `unnest_tokens`, and then we also load the `wordcloud` library for obvious reasons.  
+Now we are ready to create our first word cloud.  Here we do just a single cloud.  First, we have to load the `tidytext` library which allows us to easily extract words from the open ended text using `unnest_tokens`, and then we also load the `wordcloud` library for obvious reasons.  
 
 ```{r}
 library(tidytext)
@@ -109,7 +109,7 @@ d4 %>%
    count(ideo_x, word, wt = WTFCTR, sort = T) %>%
    pivot_wider(names_from = ideo_x, values_from = n, values_fill = 0) %>% 
    column_to_rownames(var = "word") %>% 
-   comparison.cloud(colors = c("red", "blue", "grey"),
+   comparison.cloud(colors = c("blue", "grey", "red"),
                     scale = c(0.6,3),
                     max.words = 30,
                     random.order = F,
@@ -157,7 +157,7 @@ d3 %>%
    count(ideo_x, word, wt = WTFCTR, sort = T) %>%
    pivot_wider(names_from = ideo_x, values_from = n, values_fill = 0) %>% 
    column_to_rownames(var = "word") %>% 
-   comparison.cloud(colors = c("red", "blue", "grey"),
+   comparison.cloud(colors = c("red", "grey", "blue"),
                     scale = c(0.6,3),
                     max.words = 30,
                     random.order = F,
@@ -237,7 +237,7 @@ ggraph(swnet) +
    theme_graph()
 ```
 
-But most frequently, you'll be drawing it with edges AND nodes.  Below, I've done exactly that AND I've specified a different kind of layout, a forced layout:
+But most frequently, you'll be drawing it with edges AND nodes.  Below, I've done exactly that AND I've specified a different kind of layout, a force-directed layout.  These are the most popular layouts.  These algorithms, such as Fruchterman-Reingold (used here), try to position the nodes so that the edges have similar length and there are as few crossing edges as possible. The idea is to generate “clean” layouts, where nodes that are closer to each other share more connections in common that those that are located further apart. Note that this is a non-deterministic algorithm: choosing a different seed will generate different layouts.
 
 ```{r}
 # draw basic network map
@@ -314,7 +314,7 @@ ggraph(swnet, "unrooted") +
    geom_edge_link() +
    geom_node_point(aes(color = good), size = 3) + 
    geom_node_text(aes(label = name), repel=TRUE) +
-   scale_color_manual(values = c("green", "black")) +
+   scale_color_manual(values = c("black", "green")) +
    theme_graph()
 ```
 
@@ -440,7 +440,7 @@ ggraph(swnet, "linear") +
    geom_edge_arc(aes(color = exchange)) +
    geom_node_text(aes(label = name), repel=TRUE) +
    geom_node_point(aes(color = good), size = 3) + 
-   scale_color_manual(values = c("green", "black")) +
+   scale_color_manual(values = c("black", "green")) +
    theme_graph()
 ```
 
@@ -452,7 +452,20 @@ ggraph(swnet, "linear", circular = TRUE) +
    geom_edge_arc(aes(color = exchange)) +
    geom_node_text(aes(label = name), repel=TRUE) +
    geom_node_point(aes(color = good), size = 3) + 
-   scale_color_manual(values = c("green", "black")) +
+   scale_color_manual(values = c("black", "green")) +
    theme_graph()
 ```
 
+### Other Network Calcs
+
+There are many other calculations you can make using the tidygraph package that could enhance your analysis, but this gets us deeper into Social Network Analysis that is beyond the scope of this course.  Below, however, are my very brief notes about some of these calculations that could be helpful guides for further study:
+
+- **Strength** is a weighted measure of degree that takes into account the number of edges that go from one node to another. In this network, it will be the total number of interactions of each character with anybody else. `centrality_degree`
+- **Closeness** measures how many steps are required to access every other node from a given node. It’s a measure of how long information takes to arrive (who hears news first?). `centrality_closeness`
+- **Betweenness** measures brokerage or gatekeeping potential. It is (approximately) the number of shortest paths between nodes that pass through a particular node. `centrality_betweenness`
+- **Eigenvector centrality** is a measure of being well-connected to the well-connected. First eigenvector of the graph adjacency matrix. Only works with undirected networks. `eigen_centrality`
+- **Page rank** approximates probability that any message will arrive to a particular node. This algorithm was developed by Google founders, and originally applied to website links. `centrality_pagerank`
+- **Authority score** is another measure of centrality initially applied to the Web. A node has high authority when it is linked by many other nodes that are linking many other nodes. `centrality_authority`
+- Finally, not exactly a measure of centrality, but we can learn more about who each node is connected to by using the following functions: **neighbors** (for direct neighbors) and **ego** (for neighbors up to n neighbors away) `local_members`
+
+*See "Social network analysis with R: node and network properties" by Alex Hanna, Pablo Barbera, Dan Cervone for more info on this*
